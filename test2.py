@@ -7,10 +7,11 @@ import os
 import random
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
 from keras import backend as K
 from keras.models import load_model
+from PIL import Image, ImageDraw, ImageFont
 from yolo import YoloV2
+
 
 
 parser = argparse.ArgumentParser(
@@ -23,7 +24,7 @@ parser.add_argument(
     '-a',
     '--anchors_path',
     help='path to anchors file, defaults to yolo_anchors.txt',
-    default='model_data/yolo_anchors.txt')
+    default='model_data/yolov2_anchors.txt')
 parser.add_argument(
     '-c',
     '--classes_path',
@@ -53,20 +54,6 @@ parser.add_argument(
     default=.5)
 
 
-def generate_colors_bounding_box(class_names):
-    # Generate colors for drawing bounding boxes.
-    hsv_tuples = [(x / len(class_names), 1., 1.)
-                  for x in range(len(class_names))]
-    colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
-    colors = list(
-        map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)),
-            colors))
-    random.seed(10101)  # Fixed seed for consistent colors across runs.
-    random.shuffle(colors)  # Shuffle colors to decorrelate adjacent classes.
-    random.seed(None)  # Reset seed to default.
-    return colors
-
-
 def _main(args):
     model_path = os.path.expanduser(args.model_path)
     assert model_path.endswith('.h5'), 'Keras model must be a .h5 file.'
@@ -90,40 +77,45 @@ def _main(args):
         anchors = [float(x) for x in anchors.split(',')]
         anchors = np.array(anchors).reshape(-1, 2)
 
-#############################################################
-
-
-    input_image_shape = K.placeholder(shape=(2,))
-    yolo_model = YoloV2(anchors, class_names, input_image_shape)
+    yolo = YoloV2()
+    yolo_model = yolo.model
 
     # Verify model, anchors, and classes are compatible
-    #num_classes = len(class_names)
-    #num_anchors = len(anchors)
+    num_classes = len(class_names)
+    num_anchors = len(anchors)
     # TODO: Assumes dim ordering is channel last
-    
-    #model_output_channels = yolo_model.layers[-1].output_shape[-1]
-    #assert model_output_channels == num_anchors * (num_classes + 5), \
-     #   'Mismatch between model and given anchor and class sizes. ' \
-     #   'Specify matching anchors and classes with --anchors_path and ' \
-     #   '--classes_path flags.'
-    #print('{} model, anchors, and classes loaded.'.format(model_path))
+    model_output_channels = yolo_model.layers[-1].output_shape[-1]
+    assert model_output_channels == num_anchors * (num_classes + 5), \
+        'Mismatch between model and given anchor and class sizes. ' \
+        'Specify matching anchors and classes with --anchors_path and ' \
+        '--classes_path flags.'
+    print('{} model, anchors, and classes loaded.'.format(model_path))
 
     # Check if model is fully convolutional, assuming channel last order.
     model_image_size = yolo_model.layers[0].input_shape[1:3]
     is_fixed_size = model_image_size != (None, None)
 
-
+    # Generate colors for drawing bounding boxes.
+    hsv_tuples = [(x / len(class_names), 1., 1.)
+                  for x in range(len(class_names))]
+    colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
+    colors = list(
+        map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)),
+            colors))
+    random.seed(10101)  # Fixed seed for consistent colors across runs.
+    random.shuffle(colors)  # Shuffle colors to decorrelate adjacent classes.
+    random.seed(None)  # Reset seed to default.
 
     # Generate output tensor targets for filtered bounding boxes.
     # TODO: Wrap these backend operations with Keras layers.
-    yolo_outputs = yolo_model.yolo_head(yolo_model.output, anchors, len(class_names))
-
-    boxes, scores, classes = yolo_model.yolo_eval(
+    yolo_outputs = yolo.yolo_head(yolo_model.output, anchors, len(class_names))
+    input_image_shape = K.placeholder(shape=(2, ))
+    boxes, scores, classes = yolo.yolo_eval(
         yolo_outputs,
         input_image_shape,
         score_threshold=args.score_threshold,
         iou_threshold=args.iou_threshold)
-###############################################################################################################
+
     for image_file in os.listdir(test_path):
         try:
             image_type = imghdr.what(os.path.join(test_path, image_file))
@@ -158,7 +150,6 @@ def _main(args):
             })
         print('Found {} boxes for {}'.format(len(out_boxes), image_file))
 
-        colors = generate_colors_bounding_box(class_names)
         font = ImageFont.truetype(
             font='font/FiraMono-Medium.otf',
             size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))

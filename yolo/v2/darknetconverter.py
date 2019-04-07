@@ -309,7 +309,6 @@ class DarkNetToKeras(object):
 
     def __del__(self):
         self.weights_file.close()
-        K.clear_session()
 
 
 if __name__ == '__main__':
