@@ -1,25 +1,24 @@
 #!usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 from keras import Model
-from keras.layers import Lambda, Conv2D, Input
-from keras.layers.merge import concatenate
 from keras import backend as K
+from keras.layers import Lambda
+from keras.layers.merge import concatenate
 
-from yolo.yolo_v2 import compose, space_to_depth_x2_output_shape, space_to_depth_x2
-from yolo.yolo_v2 import DarknetConv2D, DarkNetYoloCommonLayer
-from yolo.yolo_v2 import DarkNetToKeras, DarkNet19
+from .darknet19 import DarkNet19
+from .darknetconverter import DarkNetToKeras
+from .util import compose, space_to_depth_x2_output_shape, space_to_depth_x2, DarkNetYoloCommonLayer, DarknetConv2D
 
 
 class YoloV2(DarkNetYoloCommonLayer):
     _model = None
 
     def __init__(self):
-        original = DarkNetToKeras().extract_model()
+        original = DarkNetToKeras()
+        original.extract_model()
         self.model = original.model
 
     @property

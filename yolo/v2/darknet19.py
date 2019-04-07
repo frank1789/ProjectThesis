@@ -8,7 +8,7 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras.models import Model
 from keras.regularizers import l2
 
-from yolo.yolo_v2.util import DarkNetYoloCommonLayer, compose
+from .util import DarkNetYoloCommonLayer, compose
 
 # Partial wrapper for Convolution2D with static default argument.
 _DarknetConv2D = partial(Conv2D, padding='same')
