@@ -1,39 +1,24 @@
 #!usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import numpy as np
-from keras.layers import Lambda, Conv2D
-from keras.layers.merge import concatenate
+import os
 
-import tensorflow as tf
+import numpy as np
+from keras.layers import Lambda, Conv2D, Input
+from keras.layers.merge import concatenate
 from keras import backend as K
-#from baseneuralnetwork import K, tf
+
 from .util import *
 from .darknet19 import *
+from .darknetconverter import DarkNetToKeras
 
 
-def space_to_depth_x2(x):
-    """
-    Thin wrapper for Tensorflow space_to_depth with block_size=2.
-    """
-    # Import currently required to make Lambda work.
-    # See: https://github.com/fchollet/keras/issues/5088#issuecomment-273851273
-    return tf.space_to_depth(x, block_size=2)
-
-
-def space_to_depth_x2_output_shape(input_shape):
-    """Determine space_to_depth output shape for block_size=2.
-
-    Note: For Lambda with TensorFlow backend, output shape may not be needed.
-    """
-    return (input_shape[0], input_shape[1] // 2, input_shape[2] // 2, 4 *
-            input_shape[3]) if input_shape[1] else (input_shape[0], None, None,
-                                                    4 * input_shape[3])
+# from baseneuralnetwork import K, tf
 
 
 class YoloV2(DarkNetYoloCommonLayer):
 
-    def __init__(self, anchors, class_names, input_shape, include_top=False, weights=False):
+    def __init__(self, anchors, class_names, input_shape, include_top=False, freeze_body=False):
         """
         returns the body of the model and the model
 
@@ -49,30 +34,30 @@ class YoloV2(DarkNetYoloCommonLayer):
 
         model: YOLOv2 with custom loss Lambda layer
         """
+        original_yolo = DarkNetToKeras()
+        original_yolo.extract_model()
 
         detectors_mask_shape = (13, 13, 5, 1)
         matching_boxes_shape = (13, 13, 5, 5)
 
         # Create model input layers.
-        image_input = input_shape
         boxes_input = Input(shape=(None, 5))
         detectors_mask_input = Input(shape=detectors_mask_shape)
         matching_boxes_input = Input(shape=matching_boxes_shape)
 
         # Create model body.
-        yolo_model = self.yolo_body(image_input, len(anchors), len(class_names))
+        yolo_model = self.yolo_body(input_shape, len(anchors), len(class_names))
         topless_yolo = Model(yolo_model.input, yolo_model.layers[-2].output)
 
-        if load_pretrained:
+        if not include_top:
             # Save topless yolo:
-            topless_yolo_path = os.path.join('model_data', 'yolo_topless.h5')
-            if not os.path.exists(topless_yolo_path):
-                print("CREATING TOPLESS WEIGHTS FILE")
-                yolo_path = os.path.join('model_data', 'yolo.h5')
-                model_body = load_model(yolo_path)
+            export_topless_model = os.path.join('model_data', 'yolo_topless.h5')
+            if not os.path.exists(export_topless_model):
+                print("==> CREATING TOPLESS WEIGHTS FILE")
+                model_body = original_yolo.model
                 model_body = Model(model_body.inputs, model_body.layers[-2].output)
-                model_body.save_weights(topless_yolo_path)
-            topless_yolo.load_weights(topless_yolo_path)
+                model_body.save_weights(export_topless_model)
+            topless_yolo.load_weights(export_topless_model)
 
         if freeze_body:
             for layer in topless_yolo.layers:
@@ -206,7 +191,8 @@ class YoloV2(DarkNetYoloCommonLayer):
             box_maxes[..., 0:1]  # x_max
         ])
 
-    def yolo_loss(args,
+    @classmethod
+    def yolo_loss(cls, args,
                   anchors,
                   num_classes,
                   rescore_confidence=False,
@@ -253,7 +239,7 @@ class YoloV2(DarkNetYoloCommonLayer):
         no_object_scale = 1
         class_scale = 1
         coordinates_scale = 1
-        pred_xy, pred_wh, pred_confidence, pred_class_prob = yolo_head(
+        pred_xy, pred_wh, pred_confidence, pred_class_prob = cls.yolo_head(
             yolo_output, anchors, num_classes)
 
         # Unadjusted box predictions for loss.
@@ -405,10 +391,8 @@ class YoloV2(DarkNetYoloCommonLayer):
         classes = K.gather(classes, nms_index)
         return boxes, scores, classes
 
-
     def evaluate(self):
         return self.yolo_eval
-
 
     @classmethod
     def preprocess_true_boxes(cls, true_boxes, anchors, image_size):
