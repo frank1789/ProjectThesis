@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from keras import backend as K
 from keras.models import load_model
-from yolo.yolo_v2 import *
+from yolo import YoloV2
 
 
 parser = argparse.ArgumentParser(
@@ -64,6 +64,7 @@ def generate_colors_bounding_box(class_names):
     random.seed(10101)  # Fixed seed for consistent colors across runs.
     random.shuffle(colors)  # Shuffle colors to decorrelate adjacent classes.
     random.seed(None)  # Reset seed to default.
+    return colors
 
 
 def _main(args):
@@ -90,8 +91,10 @@ def _main(args):
         anchors = np.array(anchors).reshape(-1, 2)
 
 #############################################################
+
+
     input_image_shape = K.placeholder(shape=(2,))
-    yolo_model = YoloV2(anchors, class_names)
+    yolo_model = YoloV2(anchors, class_names, input_image_shape)
 
     # Verify model, anchors, and classes are compatible
     #num_classes = len(class_names)
@@ -155,6 +158,7 @@ def _main(args):
             })
         print('Found {} boxes for {}'.format(len(out_boxes), image_file))
 
+        colors = generate_colors_bounding_box(class_names)
         font = ImageFont.truetype(
             font='font/FiraMono-Medium.otf',
             size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
