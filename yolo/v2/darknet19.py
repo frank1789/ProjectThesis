@@ -8,7 +8,7 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras.models import Model
 from keras.regularizers import l2
 
-from .util import compose, DarkNetYoloCommonLayer
+from yolo.yolo_v2.util import DarkNetYoloCommonLayer, compose
 
 # Partial wrapper for Convolution2D with static default argument.
 _DarknetConv2D = partial(Conv2D, padding='same')
@@ -57,4 +57,3 @@ if __name__ == '__main__':
     input = Input(shape=(690, 690, 3))
     model = DarkNet19(input)
     model.darknet.summary()
-    model.darknet.inputs

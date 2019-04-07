@@ -19,7 +19,7 @@ from keras.utils.vis_utils import plot_model as plot
 from keras import backend as K
 import numpy as np
 
-from .util import space_to_depth_x2_output_shape, space_to_depth_x2
+import yolo.yolo_v2.util
 
 # from baseneuralnetwork import K
 
@@ -257,8 +257,8 @@ class DarkNetToKeras(object):
                 assert block_size == 2, 'Only reorg with stride 2 supported.'
                 self.all_layers.append(
                     Lambda(
-                        space_to_depth_x2,
-                        output_shape=space_to_depth_x2_output_shape,
+                        yolo.yolo_v2.util.space_to_depth_x2,
+                        output_shape=yolo.yolo_v2.util.space_to_depth_x2_output_shape,
                         name='space_to_depth_x2')(prev_layer))
                 prev_layer = self.all_layers[-1]
 
@@ -298,7 +298,7 @@ class DarkNetToKeras(object):
         self.load_weights()
         self.parse_darknet_configuration()
         self.generate_keras_model()
-        self.model = self._save_model()
+        self._save_model()
 
     @property
     def model(self):
@@ -315,7 +315,4 @@ class DarkNetToKeras(object):
 
 if __name__ == '__main__':
     a = DarkNetToKeras()
-    a.load_weights()
-    a.parse_darknet_configuration()
-    a.generate_keras_model()
-    a._save_model()
+    a.extract_model()

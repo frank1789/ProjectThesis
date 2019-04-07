@@ -3,86 +3,32 @@
 
 import os
 
+import tensorflow as tf
 import numpy as np
+from keras import Model
 from keras.layers import Lambda, Conv2D, Input
 from keras.layers.merge import concatenate
 from keras import backend as K
 
-from .util import *
-from .darknet19 import *
-from .darknetconverter import DarkNetToKeras
-
-
-# from baseneuralnetwork import K, tf
+from yolo.yolo_v2 import compose, space_to_depth_x2_output_shape, space_to_depth_x2
+from yolo.yolo_v2 import DarknetConv2D, DarkNetYoloCommonLayer
+from yolo.yolo_v2 import DarkNetToKeras, DarkNet19
 
 
 class YoloV2(DarkNetYoloCommonLayer):
+    _model = None
 
-    def __init__(self, anchors, class_names, input_shape, include_top=False, freeze_body=False):
-        """
-        returns the body of the model and the model
+    def __init__(self):
+        original = DarkNetToKeras().extract_model()
+        self.model = original.model
 
-        # Params:
+    @property
+    def model(self):
+        return self._model
 
-        load_pretrained: whether or not to load the pretrained model or initialize all weights
-
-        freeze_body: whether or not to freeze all weights except for the last layer's
-
-        # Returns:
-
-        model_body: YOLOv2 with new output layer
-
-        model: YOLOv2 with custom loss Lambda layer
-        """
-        original_yolo = DarkNetToKeras()
-        original_yolo.extract_model()
-
-        detectors_mask_shape = (13, 13, 5, 1)
-        matching_boxes_shape = (13, 13, 5, 5)
-
-        # Create model input layers.
-        boxes_input = Input(shape=(None, 5))
-        detectors_mask_input = Input(shape=detectors_mask_shape)
-        matching_boxes_input = Input(shape=matching_boxes_shape)
-
-        # Create model body.
-        yolo_model = self.yolo_body(input_shape, len(anchors), len(class_names))
-        topless_yolo = Model(yolo_model.input, yolo_model.layers[-2].output)
-
-        if not include_top:
-            # Save topless yolo:
-            export_topless_model = os.path.join('model_data', 'yolo_topless.h5')
-            if not os.path.exists(export_topless_model):
-                print("==> CREATING TOPLESS WEIGHTS FILE")
-                model_body = original_yolo.model
-                model_body = Model(model_body.inputs, model_body.layers[-2].output)
-                model_body.save_weights(export_topless_model)
-            topless_yolo.load_weights(export_topless_model)
-
-        if freeze_body:
-            for layer in topless_yolo.layers:
-                layer.trainable = False
-        final_layer = Conv2D(len(anchors) * (5 + len(class_names)), (1, 1), activation='linear')(topless_yolo.output)
-
-        model_body = Model(image_input, final_layer)
-
-        # Place model loss on CPU to reduce GPU memory usage.
-        with tf.device('/cpu:0'):
-            # TODO: Replace Lambda with custom Keras layer for loss.
-            model_loss = Lambda(
-                yolo_loss,
-                output_shape=(1,),
-                name='yolo_loss',
-                arguments={'anchors': anchors,
-                           'num_classes': len(class_names)})([
-                model_body.output, boxes_input,
-                detectors_mask_input, matching_boxes_input
-            ])
-
-        self.m_model = Model(
-            [model_body.input, boxes_input, detectors_mask_input,
-             matching_boxes_input], model_loss)
-        self.m_model_body = model_body
+    @model.setter
+    def model(self, model):
+        self._model = model
 
     @classmethod
     def yolo_body(cls, inputs, num_anchors, num_classes):
