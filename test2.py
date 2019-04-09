@@ -74,12 +74,12 @@ def _main(args):
         anchors = [float(x) for x in anchors.split(',')]
         anchors = np.array(anchors).reshape(-1, 2)
     ####################################################################################################################
-
-    model, outputs = YoloV2(anchors, len(class_names))
-
-    #    # Verify model, anchors, and classes are compatible
+    # Verify model, anchors, and classes are compatible
     num_classes = len(class_names)
     num_anchors = len(anchors)
+    yolo = YoloV2()
+    outputs = yolo.head(feats=yolo.model.output, anchors=anchors, num_classes=num_classes)
+    model = yolo.model
     #    # TODO: Assumes dim ordering is channel last
     model_output_channels = model.layers[-1].output_shape[-1]
     assert model_output_channels == num_anchors * (num_classes + 5), \
