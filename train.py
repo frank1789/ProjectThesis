@@ -16,15 +16,11 @@ from yolo import YoloV2, evaluate
 from yolo import preprocess_true_boxes, draw_boxes
 from yolo.v2.core.multi_gpu_model import multi_gpu_model
 
-import cv2
-
 path = []
 for root, dir, files in os.walk("/Users/francesco/Downloads/the-simpsons-characters-dataset/simpsons_dataset"):
     for file in files:
         if file.endswith(".jpeg"):
-            path.appned( os.path.join(root, file))
-
-
+            path.append(os.path.join(root, file))
 
 
 def create_model(anchors, class_names, load_pretrained=True, freeze_body=True):
