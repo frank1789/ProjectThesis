@@ -146,7 +146,6 @@ def _main(args):
 
         for i, c in reversed(list(enumerate(out_classes))):
             predicted_class = class_names[c]
-            box = out_boxes[i]
             score = out_scores[i]
 
             label = '{} {:.2f}'.format(predicted_class, score)
@@ -154,7 +153,7 @@ def _main(args):
             draw = ImageDraw.Draw(image)
             label_size = draw.textsize(label, font)
 
-            top, left, bottom, right = box
+            top, left, bottom, right = out_boxes[i]
             top = max(0, np.floor(top + 0.5).astype('int32'))
             left = max(0, np.floor(left + 0.5).astype('int32'))
             bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))

@@ -10,10 +10,10 @@ import numpy as np
 import requests
 from keras import Model
 from keras import backend as K
-from keras.utils.vis_utils import plot_model as plot
 from keras.layers import Input, BatchNormalization, Conv2D, LeakyReLU, Lambda
 from keras.layers import concatenate, MaxPooling2D, GlobalAveragePooling2D
 from keras.regularizers import l2
+from keras.utils.vis_utils import plot_model as plot
 from tqdm import tqdm
 
 
@@ -57,7 +57,7 @@ class DarkNetToKeras(object):
         self.weights_file = None
         self.cfg_parser = None
         self.m_all_layers = []
-        self._m_model =None
+        self._m_model = None
         if not os.path.exists(os.path.join(os.getcwd(), self._CONFIG)):
             self.config_path = self._download(self._URL_CONFIG_FILE, self._CONFIG)
 
@@ -70,7 +70,8 @@ class DarkNetToKeras(object):
         else:
             self.weights_path = os.path.join(os.getcwd(), self._WEIGHTS)
 
-    def _download(self, url, namefile):
+    @staticmethod
+    def _download(url, namefile):
         """
         Download the file
         :param url: file to download
@@ -243,7 +244,7 @@ class DarkNetToKeras(object):
                 prev_layer = all_layers[-1]
 
             elif section.startswith('avgpool'):
-                if self.cfg_parser.items(section) != []:
+                if self.cfg_parser.items(section) is not []:
                     raise ValueError("{} with params unsupported.".format(section))
                 self.m_all_layers.append(GlobalAveragePooling2D()(prev_layer))
                 prev_layer = all_layers[-1]
