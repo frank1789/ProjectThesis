@@ -1,9 +1,12 @@
 #!usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+
 import numpy as np
 import tensorflow as tf
 from keras import Model
+from keras.models import load_model
 from keras import backend as K
 from keras.layers import Lambda
 from keras.layers.merge import concatenate
@@ -46,9 +49,16 @@ class YoloV2:
     _model = None
 
     def __init__(self):
-        original = DarkNetToKeras()
-        original.extract_model()
-        self.model = original.model
+        for root, dir, files in os.walk(os.getcwd()):
+            for file in files:
+                if file.endswith(".h5"):
+                    print("==> Model already exist, than load...")
+                    self.model = load_model(os.path.join(root, file))
+        if self.model is None:
+            print("==> Model already not exist, starting download...")
+            original = DarkNetToKeras()
+            original.extract_model()
+            self.model = original.model
 
     @property
     def model(self):
