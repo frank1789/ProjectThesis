@@ -11,6 +11,8 @@ from keras import backend as K
 
 from yolo import YoloV2, evaluate, get_colors_for_classes
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 parser = argparse.ArgumentParser(
     description='Run a YOLO_v2 style detection model on test images..')
 parser.add_argument(
