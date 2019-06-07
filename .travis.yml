@@ -22,7 +22,7 @@ install:
 
 # command to run tests
 script:
-  - test2.py
+  - python3 test2.py
 
 after_success:
   - coveralls
