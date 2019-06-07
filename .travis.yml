@@ -5,7 +5,11 @@ python:
   - '3.6'
   - '3.7'
 
-cache: pip
+cache:
+  pip: true
+  directories:
+    - $HOME/.ccache
+    - $HOME/.cache/matplotlib
 
 matrix:
   fast_finish: true
