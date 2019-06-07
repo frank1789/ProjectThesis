@@ -23,7 +23,7 @@ install:
 
 # command to run tests
 script:
-  - coverage run --source=greb -m main.py
+  - coverage run --source=main.py
 
 after_success:
   - coveralls
