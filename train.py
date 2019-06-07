@@ -1,3 +1,6 @@
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 This is a script that can be used to retrain the YOLOv2 model for your own dataset.
 """
