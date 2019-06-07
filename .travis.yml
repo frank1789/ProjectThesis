@@ -23,7 +23,7 @@ install:
 
 # command to run tests
 script:
-  - coverage run --source=main.py
+  - coverage run main.py
 
 after_success:
   - coveralls
