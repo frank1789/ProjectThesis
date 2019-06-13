@@ -37,7 +37,7 @@ USER movidius
 
 WORKDIR /home/movidius
 
-RUN -b ncsdk2 https://github.com/movidius/ncsdk.git
+RUN git clone -b ncsdk2 https://github.com/movidius/ncsdk.git
 
 WORKDIR /home/movidius/ncsdk
 
