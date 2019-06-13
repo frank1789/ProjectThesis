@@ -25,14 +25,20 @@ RUN apt-get update \
       usbutils \
       wget \
       cmake \
-    && apt-get clean all \
-    && rm /var/lib/apt/lists/*
+    && apt-get clean all
+
 RUN useradd -c "Movidius User" -m movidius
-COPY 10-installer /etc/sudoers.d/
+
+COPY installer /etc/sudoers.d/
+
 RUN mkdir -p /etc/udev/rules.d/
+
 USER movidius
+
 WORKDIR /home/movidius
+
 RUN -b ncsdk2 https://github.com/movidius/ncsdk.git
+
 WORKDIR /home/movidius/ncsdk
-#RUN make install
-ENTRYPOINT ["bin/bash"]
+
+RUN make install
