@@ -42,3 +42,12 @@ RUN git clone -b ncsdk2 https://github.com/movidius/ncsdk.git
 WORKDIR /home/movidius/ncsdk
 
 RUN make install
+
+ENV SCRIPT_DIR /script
+WORKDIR ${SCRIPT_DIR}
+COPY requirements.txt ${SCRIPT_DIR}
+RUN pip3 install -r requirements.txt
+
+CMD ["/bin/bash"]
+
+
