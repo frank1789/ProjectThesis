@@ -5,11 +5,23 @@ python:
   - '3.6'
   - '3.7'
 
+addons:
+  apt:
+    packages:
+      - docker-ce
+
+service:
+- docker
+
 cache:
   pip: true
   directories:
     - $HOME/.ccache
     - $HOME/.cache/matplotlib
+
+before_install:
+  - sudo apt-get update
+  - docker build -t ncsdkv2 .
 
 matrix:
   fast_finish: true
