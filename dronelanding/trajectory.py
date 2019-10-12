@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # define constant and shortcut
-#from numpy.core._multiarray_umath import ndarray
+# from numpy.core._multiarray_umath import ndarray
 
 PI = np.pi
 cos = np.cos
@@ -34,8 +34,7 @@ class Transformation:
     def __init__(self):
         self.M = np.zeros((1, 3))
 
-    @classmethod
-    def translate(cls, vec, offset=np.zeros((3, 3))):
+    def translate(self, vec, offset=np.zeros((3, 3))):
         """
         Tranlsate 'vect' by a certain offset
         :param vec: original point
@@ -44,10 +43,10 @@ class Transformation:
         """
         self.M += vec
         self.M += offset
-        return self.M.reshape(1, 3)
+        # return self.M.reshape(1, 3)
+        return self
 
-    @classmethod
-    def rotate(cls, axis, vec, theta):
+    def rotate(self, axis, vec, theta):
         """
         Rotate multidimensional array `X` `theta` degrees around axis `axis`
         :param axis: rotation axis
@@ -57,40 +56,61 @@ class Transformation:
         """
         c, s = np.cos(theta), np.sin(theta)
         if axis == 'X':
-            cls.M = np.dot(vec, np.array([
+            self.M = np.dot(vec, np.array([
                 [1., 0, 0],
                 [0, c, -s],
                 [0, s, c]
             ]))
         elif axis == 'Y':
-            cls.M = np.dot(vec, np.array([
+            self.M = np.dot(vec, np.array([
                 [c, 0, -s],
                 [0, 1, 0],
                 [s, 0, c]
             ]))
         elif axis == 'Z':
-            cls.M = np.dot(vec, np.array([
+            self.M = np.dot(vec, np.array([
                 [c, -s, 0],
                 [s, c, 0],
                 [0, 0, 1.],
             ]))
 
-        return cls.M
+        return self.M
 
 
 class Trajectory(object):
-    def __init__(self, minradius, maxradius, step_size=1.5, increment=2.5):
-        print("Generate hemisphere minimum radius {:3.3f}, maximum radius {:3.3f}".format(
-            minradius, maxradius))
-        self.min_radius = minradius
-        self.max_radius = maxradius
-        self.coordinate = []
-        self.hemisphere = []
-        self.radius = list(self.incremental_range(
-            self.min_radius, self.max_radius, step_size, increment))
-        self.lowest_value = max(self.radius)
-        for i in self.radius:
-            self.hemisphere.append(self.generate_hemisphere(i))
+    shape = []
+    coordinate = []
+
+    def __init__(self, shape, minradius, maxradius, step_size=1.0, increment=1.5):
+        self.build_shape(shape, minradius, maxradius, step_size, increment)
+
+    @classmethod
+    def build_shape(cls, shape, minradius, maxradius, step_size, increment):
+        if shape == "hemisphere":
+            print("Generate hemisphere minimum radius {:3.3f}, maximum radius {:3.3f}".format(
+                minradius, maxradius))
+            # generates a list with concentric rays
+            radius_list = list(cls.incremental_range(
+                minradius, maxradius, step_size, increment))
+            cls.lowest_value = max(radius_list)
+            print("All radius values: {}, max radius: {}".format(
+                radius_list, cls.lowest_value))
+            for r in radius_list:
+                cls.shape.append(cls.generate_hemisphere(r))
+        elif shape == "pyramid":
+            print("Generate trunk of a pyramid minimum radius {:3.3f}, maximum radius {:3.3f}".format(
+                minradius, maxradius))
+            # generates a list with concentric rays
+            radius_list = list(cls.incremental_range(
+                minradius, maxradius, step_size, increment))
+            cls.lowest_value = max(radius_list)
+            print("All radius values: {}, max radius: {}".format(
+                radius_list, cls.lowest_value))
+            for r in radius_list:
+                cls.shape.append(cls.generate_trunk_pyramid(-r, r, r))
+        else:
+            raise ValueError(
+                "Not valid input the shape must be: Hemisphere, ecc.")
 
     @staticmethod
     def incremental_range(start, stop, step, inc):
@@ -111,19 +131,25 @@ class Trajectory(object):
         z = r * sin(theta)
         return x, y, z
 
+    @classmethod
+    def generate_trunk_pyramid(cls, min_size, max_size, r):
+        x, y, z = np.mgrid[min_size: max_size: 20j,
+                           min_size * 1.20: max_size * 1.20: 20j,
+                           0: r: 20j]
+        return x, y, z
+
+    #     X, Y, Z = np.meshgrid(np.arange(0, size, 1),
+    #                   np.arange(0, size, 1),
+    #                   np.arange(0, size, 1))
+
     def get_translation(self):
-        lowest_point = 0.0
-        for x, y, z in self.hemisphere:
+        for x, y, z in self.shape:
             for x_i, y_i, z_i in zip(x, y, z):
                 for x_j, y_j, z_j in zip(x_i, y_i, z_i):
                     vector_list = [x_j, y_j, z_j]
-                    if not (-0.1 > x_j > 0.1) or not (-0.1 > y_j > 0.1):
-                        # translate hemisphere
-                        # pass
-                        # else:
-                        vr = Transformation().translate(
-                            vector_list, np.array([0, 0, self.lowest_value])).tolist()[0]
-                        self.coordinate.append(dict(x=vr[0], y=vr[1], z=vr[2]))
+                    #vr = Transformation().translate(
+                    #    vector_list, np.array([0, 0, self.lowest_value])).rotate('Y', vector_list, PI/6).tolist()
+                    self.coordinate.append(dict(x=vector_list[0], y=vector_list[1], z=vector_list[2]))
         return self.coordinate
 
 
@@ -134,33 +160,17 @@ if __name__ == "__main__":
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    camera_point = Trajectory(0.10, 30)
+    camera_point = Trajectory("pyramid", 0.10, 30)
     print(len(camera_point.get_translation()))
     for j in camera_point.get_translation():
        # print(j)
         x, y, z = j.values()
-
-        # x, y, z =
-
         ax.scatter(x, y, z)
 
     plt.tight_layout()
     plt.show()
 
-    # ax.scatter(xx,yy,zz,color="k",s=20)
-
     # ax.set_xlim([-1,1])
     # ax.set_ylim([-1,1])
     # ax.set_zlim([-1,1])
-    # ax.set_aspect('equal')
-
-    # def incremental_range(start, stop, step, inc):
-    #     value = start
-    #     while value < stop:
-    #         yield value
-    #         value += step
-    #         step += inc
-    #         print(value)
-    #
-    # print(list(incremental_range(0, 30, 0.05, 0.20)))
-    # print(len(list(incremental_range(0, 30, 0.05, 0.20))))
+    ax.set_aspect('equal')
