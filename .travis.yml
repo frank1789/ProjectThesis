@@ -1,0 +1,41 @@
+dist: xenial
+language: python
+python:
+  - '3.5'
+  - '3.6'
+  - '3.7'
+
+addons:
+  apt:
+    packages:
+      - docker-ce
+
+service:
+- docker
+
+cache:
+  pip: true
+  directories:
+    - $HOME/.ccache
+    - $HOME/.cache/matplotlib
+
+before_install:
+  - sudo apt-get update
+  - docker build -t ncsdkv2 .
+
+matrix:
+  fast_finish: true
+
+
+# install requirements
+install:
+  - pip install -r requirements.txt
+  - pip install python-coveralls
+  - pip install coverage
+
+# command to run tests
+script:
+  - coverage run main.py
+
+after_success:
+  - coveralls
