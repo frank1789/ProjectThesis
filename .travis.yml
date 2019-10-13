@@ -12,6 +12,6 @@ before_install:
   - pip numpy
 install:
   - pip install ".[test]" . # install package + test dependencies
-script: pytest --cov=test.py
+script: pytest --cov=./dronelanding/test.py
 after_success:
   - coveralls
