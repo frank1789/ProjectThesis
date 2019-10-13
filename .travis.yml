@@ -3,15 +3,17 @@ python:
   - 3.5
   - 3.6
   - 3.7
-before_install:
+install:
   - python --version
   - pip install -U pip
   - pip install -U pytest
   - pip install -U pytest-cov
   - pip install -U coveralls
   - pip install -U numpy
-install:
-  - pip install ".[test]" . # install package + test dependencies
-script: pytest --cov=./dronelanding/test.py
+
+before_script:
+  - py.test coveralls/tests.py --cov=example
+
+script: py.test coveralls/tests.py --doctest-modules --pep8 coveralls -v --cov coveralls --cov-report term-missing
 after_success:
   - coveralls
