@@ -4,3 +4,9 @@ omit =
     */site-packages/*
     */distutils/*
     */home/travis/virtualenv/*
+
+
+source=
+    dronelanding/test.py
+    dronelanding/trajectory.py
+    dronelanding/raspberrycamera.py
