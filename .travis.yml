@@ -12,8 +12,9 @@ install:
   - pip install -U numpy
 
 before_script:
-  - py.test dronelanding/tests.py --cov=example
+  - test_file=$(find . -name "test.py")
+  - py.test ${test_file} --cov=example
 
-script: py.test dronelanding/tests.py --doctest-modules --pep8 coveralls -v --cov coveralls --cov-report term-missing
+script: py.test ${test_file} --doctest-modules --pep8 coveralls -v --cov coveralls --cov-report term-missing
 after_success:
   - coveralls
