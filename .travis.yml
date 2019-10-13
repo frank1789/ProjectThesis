@@ -6,15 +6,14 @@ python:
 install:
   - python --version
   - pip install -U pip
-  - pip install -U pytest
-  - pip install -U pytest-cov
+  - pip install -U pytest pytest-cov
   - pip install -U coveralls
   - pip install -U numpy
 
 before_script:
   - test_file=$(find . -name "test.py")
-  - py.test ${test_file} --cov=example
+  - py.test ${test_file}
 
-script: py.test ${test_file} --doctest-modules --pep8 coveralls -v --cov coveralls --cov-report term-missing
+script: py.test ${test_file} #--doctest-modules --pep8 coveralls -v --cov coveralls --cov-report term-missing
 after_success:
   - coveralls
