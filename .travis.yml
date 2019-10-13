@@ -9,7 +9,7 @@ before_install:
   - pip install -U pytest
   - pip install -U pytest-cov
   - pip install -U coveralls
-  - pip numpy
+  - pip install -U numpy
 install:
   - pip install ".[test]" . # install package + test dependencies
 script: pytest --cov=./dronelanding/test.py
