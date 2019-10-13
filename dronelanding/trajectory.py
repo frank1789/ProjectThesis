@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from operator import itemgetter
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
 import numpy as np
 
 # define constant and shortcut
@@ -171,9 +168,8 @@ class Trajectory(object):
 
 
 if __name__ == "__main__":
-    # Set colours and render
-    Transformation()
-    # a()
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib.pyplot as plt
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
@@ -188,8 +184,3 @@ if __name__ == "__main__":
 
     plt.tight_layout()
     plt.show()
-
-    # ax.set_xlim([-1,1])
-    # ax.set_ylim([-1,1])
-    # ax.set_zlim([-1,1])
-    # ax.set_aspect('equal')

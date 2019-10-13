@@ -1,5 +1,6 @@
 #!usr/bin/env python3
 # -*- conding: utf-8 -*-
+
 import unittest
 from trajectory import PI, rad2degree, degree2rad
 from raspberrycamera import RaspberryPiCamera
