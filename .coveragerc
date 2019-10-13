@@ -7,6 +7,4 @@ omit =
 
 
 source=
-    dronelanding/test.py
-    dronelanding/trajectory.py
-    dronelanding/raspberrycamera.py
+    dronelanding/
