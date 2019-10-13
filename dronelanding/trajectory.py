@@ -106,7 +106,7 @@ class Trajectory(object):
             print("All radius values: {}, max radius: {}".format(
                 radius_list, self.highest_value))
             for r in radius_list:
-                self.shape.append(self.generate_cube(minradius, maxradius, r))
+                self.shape.append(self.generate_cube(r))
         else:
             raise ValueError(
                 "Not valid input the shape must be: 'hemisphere', 'cube'.")
@@ -120,20 +120,21 @@ class Trajectory(object):
             step += inc
             print(value)
 
-    def generate_hemisphere(self, radius):
+    @staticmethod
+    def generate_hemisphere(radius):
         r = radius
         print("radius", radius)
         phi, theta = np.mgrid[0.0: 2 * PI: 20j, 0.0: -PI: 20j]
-        x = r * cos(phi) * cos(theta)
-        y = r * sin(phi) * cos(theta)
-        z = r * sin(theta)
-        return x, y, z
+        _x = r * cos(phi) * cos(theta)
+        _y = r * sin(phi) * cos(theta)
+        _z = r * sin(theta)
+        return _x, _y, _z
 
-    def generate_cube(self, min_size, max_size, r):
-        x, y = np.mgrid[-r/2: r/2: 20j,
-                        -r/2: r/2: 20j]
-        z = np.ones((20,20)) * r
-        return x, y, z
+    @staticmethod
+    def generate_cube(r):
+        _x, _y = np.mgrid[-r/2: r/2: 20j, -r/2: r/2: 20j]
+        _z = np.ones((20, 20)) * r
+        return _x, _y, _z
 
     def translate(self):
         print("call translate")
@@ -163,16 +164,10 @@ class Trajectory(object):
         return vect
 
     def __unpack_coordinate(self):
-        for x, y, z in self.shape:
-            for x_i, y_i, z_i in zip(x, y, z):
+        for _x, _y, _z in self.shape:
+            for x_i, y_i, z_i in zip(_x, _y, _z):
                 for x_j, y_j, z_j in zip(x_i, y_i, z_i):
                     self.point_list.append([x_j, y_j, z_j])
-
-                    # vr = Transformation().translate(
-                    #    vector_list, np.array([0, 0, self.highest_value])).rotate('Y', vector_list, PI/6).tolist()
-                    # self.coordinate.append(
-                    #    dict(x=vector_list[0], y=vector_list[1], z=vector_list[2]))
-        # return self.coordinate
 
 
 if __name__ == "__main__":
