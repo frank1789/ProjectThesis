@@ -14,12 +14,11 @@ install:
 
 before_script:
   - test_file=$(find . -name "test.py")
-  - coverage run ${test_file}
+  - excluded_file=$(find . -name "camera_action.py")
 
 script:
-  - test_folder=$(find . -name "*.py")
-  - coverage report ${test_file} ${test_folder}
-  - coverage run ${test_file} ${test_folder}
+  - coverage report --source ${test_file} --omit ${excluded_file}
+  - coverage run --source ${test_file} --omit ${excluded_file}
 
 after_success:
   - coveralls
