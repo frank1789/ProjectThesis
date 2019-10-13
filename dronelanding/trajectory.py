@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # define constant and shortcut
-# from numpy.core._multiarray_umath import ndarray
-
 PI = np.pi
 cos = np.cos
 sin = np.sin
@@ -43,8 +41,7 @@ class Transformation:
         """
         self.M += vec
         self.M += offset
-        # return self.M.reshape(1, 3)
-        return self
+        return self.M.reshape(1, 3)
 
     def rotate(self, axis, vec, theta):
         """
@@ -78,39 +75,41 @@ class Transformation:
 
 
 class Trajectory(object):
-    shape = []
-    coordinate = []
 
     def __init__(self, shape, minradius, maxradius, step_size=1.0, increment=1.5):
+        self.shape = []
+        self.coordinate = []
+        self.point_list = []
+        self.highest_value = 0.0
+        self.shape_type = shape
         self.build_shape(shape, minradius, maxradius, step_size, increment)
 
-    @classmethod
-    def build_shape(cls, shape, minradius, maxradius, step_size, increment):
+    def build_shape(self, shape, minradius, maxradius, step_size, increment):
         if shape == "hemisphere":
             print("Generate hemisphere minimum radius {:3.3f}, maximum radius {:3.3f}".format(
                 minradius, maxradius))
             # generates a list with concentric rays
-            radius_list = list(cls.incremental_range(
+            radius_list = list(self.incremental_range(
                 minradius, maxradius, step_size, increment))
-            cls.lowest_value = max(radius_list)
+            self.highest_value = max(radius_list)
             print("All radius values: {}, max radius: {}".format(
-                radius_list, cls.lowest_value))
+                radius_list, self.highest_value))
             for r in radius_list:
-                cls.shape.append(cls.generate_hemisphere(r))
-        elif shape == "pyramid":
+                self.shape.append(self.generate_hemisphere(r))
+        elif shape == "cube":
             print("Generate trunk of a pyramid minimum radius {:3.3f}, maximum radius {:3.3f}".format(
                 minradius, maxradius))
             # generates a list with concentric rays
-            radius_list = list(cls.incremental_range(
+            radius_list = list(self.incremental_range(
                 minradius, maxradius, step_size, increment))
-            cls.lowest_value = max(radius_list)
+            self.highest_value = max(radius_list)
             print("All radius values: {}, max radius: {}".format(
-                radius_list, cls.lowest_value))
+                radius_list, self.highest_value))
             for r in radius_list:
-                cls.shape.append(cls.generate_trunk_pyramid(-r, r, r))
+                self.shape.append(self.generate_cube(minradius, maxradius, r))
         else:
             raise ValueError(
-                "Not valid input the shape must be: Hemisphere, ecc.")
+                "Not valid input the shape must be: 'hemisphere', 'cube'.")
 
     @staticmethod
     def incremental_range(start, stop, step, inc):
@@ -121,8 +120,7 @@ class Trajectory(object):
             step += inc
             print(value)
 
-    @classmethod
-    def generate_hemisphere(cls, radius):
+    def generate_hemisphere(self, radius):
         r = radius
         print("radius", radius)
         phi, theta = np.mgrid[0.0: 2 * PI: 20j, 0.0: -PI: 20j]
@@ -131,26 +129,50 @@ class Trajectory(object):
         z = r * sin(theta)
         return x, y, z
 
-    @classmethod
-    def generate_trunk_pyramid(cls, min_size, max_size, r):
-        x, y, z = np.mgrid[min_size: max_size: 20j,
-                           min_size * 1.20: max_size * 1.20: 20j,
-                           0: r: 20j]
+    def generate_cube(self, min_size, max_size, r):
+        x, y = np.mgrid[-r/2: r/2: 20j,
+                        -r/2: r/2: 20j]
+        z = np.ones((20,20)) * r
         return x, y, z
 
-    #     X, Y, Z = np.meshgrid(np.arange(0, size, 1),
-    #                   np.arange(0, size, 1),
-    #                   np.arange(0, size, 1))
+    def translate(self):
+        print("call translate")
 
-    def get_translation(self):
+    def rotate(self):
+        print("call rotate")
+
+    def get_coordinate(self):
+        vect = []
+        frame = 1
+        self.__unpack_coordinate()
+        if self.shape_type is "hemisphere":
+            print("==> Centering the points cloud")
+            trl_vect = np.array([0, 0, self.highest_value])
+            for point in self.point_list:
+                p = Transformation().translate(point, trl_vect).tolist()[0]
+                vect.append(dict(name="IMG{:05d}".format(
+                    frame), x=p[0], y=p[1], z=p[2]))
+                frame += 1
+        else:
+            for point in self.point_list:
+                p = point
+                vect.append(dict(name="IMG{:05d}".format(
+                    frame), x=p[0], y=p[1], z=p[2]))
+                frame += 1
+
+        return vect
+
+    def __unpack_coordinate(self):
         for x, y, z in self.shape:
             for x_i, y_i, z_i in zip(x, y, z):
                 for x_j, y_j, z_j in zip(x_i, y_i, z_i):
-                    vector_list = [x_j, y_j, z_j]
-                    #vr = Transformation().translate(
-                    #    vector_list, np.array([0, 0, self.lowest_value])).rotate('Y', vector_list, PI/6).tolist()
-                    self.coordinate.append(dict(x=vector_list[0], y=vector_list[1], z=vector_list[2]))
-        return self.coordinate
+                    self.point_list.append([x_j, y_j, z_j])
+
+                    # vr = Transformation().translate(
+                    #    vector_list, np.array([0, 0, self.highest_value])).rotate('Y', vector_list, PI/6).tolist()
+                    # self.coordinate.append(
+                    #    dict(x=vector_list[0], y=vector_list[1], z=vector_list[2]))
+        # return self.coordinate
 
 
 if __name__ == "__main__":
@@ -160,11 +182,13 @@ if __name__ == "__main__":
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    camera_point = Trajectory("pyramid", 0.10, 30)
-    print(len(camera_point.get_translation()))
-    for j in camera_point.get_translation():
-       # print(j)
-        x, y, z = j.values()
+    camera_point = Trajectory("cube", 0.10, 30)
+    camera_point2 = Trajectory("hemisphere", 0.10, 30)
+
+    print(len(camera_point2.get_coordinate()))
+    for j in camera_point.get_coordinate():
+        print(j)
+        name_file, x, y, z = j.values()
         ax.scatter(x, y, z)
 
     plt.tight_layout()
@@ -173,4 +197,4 @@ if __name__ == "__main__":
     # ax.set_xlim([-1,1])
     # ax.set_ylim([-1,1])
     # ax.set_zlim([-1,1])
-    ax.set_aspect('equal')
+    # ax.set_aspect('equal')
