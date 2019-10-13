@@ -1,4 +1,6 @@
 # .coveragerc to control coverage.py
 [run]
 omit =
-    */site-package/*
+    */site-packages/*
+    */distutils/*
+    */home/travis/virtualenv/*

@@ -2,8 +2,10 @@
 # -*- conding: utf-8 -*-
 
 import unittest
-from trajectory import PI, rad2degree, degree2rad
+
 from raspberrycamera import RaspberryPiCamera
+from trajectory import PI, rad2degree, degree2rad
+
 
 # own test class
 
