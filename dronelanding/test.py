@@ -24,10 +24,10 @@ class TestSupportFunction(unittest.TestCase):
         self.assertEqual(RaspberryPiCamera().getResolution_y(), 2464)
 
     def test_camera_constant_focal_length(self):
-        self.assertEqual(RaspberryPiCamera().getResolution_x(), 3280)
+        self.assertEqual(RaspberryPiCamera().getFocal_length(), 3.04)
 
     def test_camera_constant_sensor_size(self):
-        self.assertEqual(RaspberryPiCamera().getFocal_length(), 3.04)
+        self.assertEqual(RaspberryPiCamera().getSensor_size(), 4.60)
 
     def test_camera_constant_f_number(self):
         self.assertEqual(RaspberryPiCamera().getFnumber(), 2.0)
