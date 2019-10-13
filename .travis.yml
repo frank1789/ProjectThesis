@@ -17,8 +17,8 @@ before_script:
   - excluded_file=$(find . -name "camera_action.py")
 
 script:
-  - coverage report -m unittest ${test_file} --omit ${excluded_file}
-  - coverage run -m unittest ${test_file} --omit ${excluded_file}
+  - coverage report ${test_file} --omit ${excluded_file}
+  - coverage run ${test_file} --omit ${excluded_file}
 
 after_success:
   - coveralls
