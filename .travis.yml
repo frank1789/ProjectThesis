@@ -1,8 +1,10 @@
 language: python
+
 python:
   - 3.5
   - 3.6
   - 3.7
+
 install:
   - python --version
   - pip install -U pip
@@ -14,6 +16,10 @@ before_script:
   - test_file=$(find . -name "test.py")
   - coverage run ${test_file}
 
-script: coverage run ${test_file}
+script:
+  - test_folder=$(find . -name "*.py")
+  - coverage report ${test_file} ${test_folder}
+  - coverage run ${test_file} ${test_folder}
+
 after_success:
   - coveralls
