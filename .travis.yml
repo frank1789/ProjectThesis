@@ -12,8 +12,8 @@ install:
 
 before_script:
   - test_file=$(find . -name "test.py")
-  - py.test ${test_file}
+  - coverage run ${test_file}
 
-script: py.test ${test_file} #--doctest-modules --pep8 coveralls -v --cov coveralls --cov-report term-missing
+script: coverage run ${test_file}
 after_success:
   - coveralls
