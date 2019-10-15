@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import json
 
 # define constant and shortcut
 PI = np.pi
@@ -209,6 +210,9 @@ class Trajectory(object):
                     frame), x=p[0], y=p[1], z=p[2]))
                 frame += 1
 
+        # write json for dataset
+        with open("landingdataset.txt", "w") as outfile:
+            json.dump(vect, outfile, indent=4)
         return vect
 
     def __unpack_coordinate(self):
