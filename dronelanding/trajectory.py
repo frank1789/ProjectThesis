@@ -87,7 +87,6 @@ class Trajectory(object):
         """
         self.shape = []
         self.coordinate = []
-        self.point_list = []
         self.highest_value = 0.0
         self.shape_type = shape
         if density < 1 or type(density) is not int:
@@ -193,18 +192,19 @@ class Trajectory(object):
 
     def get_coordinate(self):
         vect = []
+        point_list = []
         frame = 1
-        self.__unpack_coordinate()
+        point_list.append(self.__unpack_coordinate())
         if self.shape_type is "hemisphere":
             print("==> Centering the points cloud")
             trl_vect = np.array([0, 0, self.highest_value])
-            for point in self.point_list:
+            for point in point_list:
                 p = Transformation().translate(point, trl_vect).tolist()[0]
                 vect.append(dict(name="IMG{:05d}".format(
                     frame), x=p[0], y=p[1], z=p[2]))
                 frame += 1
         else:
-            for point in self.point_list:
+            for point in point_list:
                 p = point
                 vect.append(dict(name="IMG{:05d}".format(
                     frame), x=p[0], y=p[1], z=p[2]))
@@ -220,7 +220,7 @@ class Trajectory(object):
         for _x, _y, _z in self.shape:
             for x_i, y_i, z_i in zip(_x, _y, _z):
                 for x_j, y_j, z_j in zip(x_i, y_i, z_i):
-                    self.point_list.append([x_j, y_j, z_j])
+                    return [x_j, y_j, z_j]
 
 
 if __name__ == "__main__":
