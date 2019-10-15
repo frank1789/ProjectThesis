@@ -97,8 +97,6 @@ class Trajectory(object):
             raise ValueError("Error: lower limit cannot be a negative number.")
         if upper_limit < 0.0:
             raise ValueError("Error: upper limit cannot be a negative number.")
-        if density < 1:
-            raise ValueError("Error: density cannot be a zero or negative number.")
         if step_size < 0.0:
             raise ValueError("Error: step size cannot be a negative number.")
         if increment < 0.0:
