@@ -73,43 +73,75 @@ class Transformation:
 
 class Trajectory(object):
 
-    def __init__(self, shape, minradius, maxradius, step_size=1.0, increment=1.5):
+    def __init__(self, shape, lower_limit, upper_limit, density, step_size=1.0, increment=1.5):
+        """
+        The trajectory class constructs a point cloud on a geometric shape. At the moment it accepts that of an
+        hemisphere and a cube (it returns a truncated pyramid).
+        :param shape: (str) the shape to be obtained, accepts hemisphere and cube.
+        :param lower_limit: (float) lower dimension which must take the geometric form (radius, side, etc.).
+        :param upper_limit: (float)upper dimension which must take the geometric form (radius, side, etc.).
+        :param density: (int) number of points that must be generated to fill the previously provided dimensions.
+        :param step_size: (float) indicates the step between the minimum and maximum size, optional.
+        :param increment: (float) indicates the increment between the next and previous step between the minimum and
+        maximum size, optional.
+        """
         self.shape = []
         self.coordinate = []
         self.point_list = []
         self.highest_value = 0.0
         self.shape_type = shape
-        self.build_shape(shape, minradius, maxradius, step_size, increment)
+        assert isinstance(density, int)
+        self.density = density
+        self.build_shape(shape, lower_limit, upper_limit, step_size, increment)
 
-    def build_shape(self, shape, minradius, maxradius, step_size, increment):
+    def build_shape(self, shape, lower, upper, step_size, increment):
+        """
+        the build function checks that the correct shape has been requested and builds it otherwise raises an error due
+        to incorrect value entered.
+        :param shape: (str) the shape to be obtained, accepts hemisphere and cube
+        :param lower: (float) lower dimension which must take the geometric form (radius, side, etc.).
+        :param upper: (float)upper dimension which must take the geometric form (radius, side, etc.).
+        :param step_size: (float) indicates the step between the minimum and maximum size, optional.
+        :param increment: (float) indicates the increment between the next and previous step between the minimum and
+        maximum size, optional.
+        """
         if shape == "hemisphere":
             print("Generate hemisphere minimum radius {:3.3f}, maximum radius {:3.3f}".format(
-                minradius, maxradius))
+                lower, upper))
             # generates a list with concentric rays
             radius_list = list(self.incremental_range(
-                minradius, maxradius, step_size, increment))
+                lower, upper, step_size, increment))
             self.highest_value = max(radius_list)
             print("All radius values: {}, max radius: {}".format(
                 radius_list, self.highest_value))
             for r in radius_list:
-                self.shape.append(self.generate_hemisphere(r))
+                self.shape.append(self.generate_hemisphere(r, self.density))
         elif shape == "cube":
-            print("Generate trunk of a pyramid minimum radius {:3.3f}, maximum radius {:3.3f}".format(
-                minradius, maxradius))
+            print("Generate cube minimum length edge {:3.3f}, maximum length edge{:3.3f}".format(
+                lower, upper))
             # generates a list with concentric rays
-            radius_list = list(self.incremental_range(
-                minradius, maxradius, step_size, increment))
-            self.highest_value = max(radius_list)
+            edges = list(self.incremental_range(
+                lower, upper, step_size, increment))
+            self.highest_value = max(edges)
             print("All radius values: {}, max radius: {}".format(
-                radius_list, self.highest_value))
-            for r in radius_list:
-                self.shape.append(self.generate_cube(r))
+                edges, self.highest_value))
+            for edge in edges:
+                self.shape.append(self.generate_cube(edge, self.density))
         else:
             raise ValueError(
                 "Not valid input the shape must be: 'hemisphere', 'cube'.")
 
     @staticmethod
     def incremental_range(start, stop, step, inc):
+        """
+        the function calculates a sequence with constant or variable pitch.
+        :param start: (float) value to start.
+        :param stop:  (float) value to reach.
+        :param step:  (float) indicates the step between the minimum and maximum size.
+        :param inc: (float) indicates the increment between the next and previous step between the minimum and
+        maximum size.
+        :return: (float) value's sequence.
+        """
         value = start
         while value < stop:
             yield value
@@ -118,19 +150,30 @@ class Trajectory(object):
             print(value)
 
     @staticmethod
-    def generate_hemisphere(radius):
-        r = radius
+    def generate_hemisphere(radius, n):
+        """
+        Generate a hemisphere.
+        :param radius: (float) radius length.
+        :param n: (int) number of points that must be generated to fill the previously provided dimensions.
+        :return: (np.array) coordinate of each points.
+        """
         print("radius", radius)
-        phi, theta = np.mgrid[0.0: 2 * PI: 20j, 0.0: -PI: 20j]
-        _x = r * cos(phi) * cos(theta)
-        _y = r * sin(phi) * cos(theta)
-        _z = r * sin(theta)
+        phi, theta = np.mgrid[0.0: 2 * PI: n * 1j, 0.0: -PI: n * 1j]
+        _x = radius * cos(phi) * cos(theta)
+        _y = radius * sin(phi) * cos(theta)
+        _z = radius * sin(theta)
         return _x, _y, _z
 
     @staticmethod
-    def generate_cube(r):
-        _x, _y = np.mgrid[-r/2: r/2: 20j, -r/2: r/2: 20j]
-        _z = np.ones((20, 20)) * r
+    def generate_cube(edge, n):
+        """
+        Generate a truncated pyramid.
+        :param edge: (float) edge length.
+        :param n: (int) number of points that must be generated to fill the previously provided dimensions.
+        :return: (np.array) coordinate of each points.
+        """
+        _x, _y = np.mgrid[-edge / 2: edge / 2: n * 1j, -edge / 2: edge / 2: n * 1j]
+        _z = np.ones((20, 20)) * edge
         return _x, _y, _z
 
     def translate(self):
@@ -161,6 +204,10 @@ class Trajectory(object):
         return vect
 
     def __unpack_coordinate(self):
+        """
+        Transform np.array in list
+        :return: (list) coordinate [x, y, z]
+        """
         for _x, _y, _z in self.shape:
             for x_i, y_i, z_i in zip(_x, _y, _z):
                 for x_j, y_j, z_j in zip(x_i, y_i, z_i):
@@ -170,17 +217,20 @@ class Trajectory(object):
 if __name__ == "__main__":
     from mpl_toolkits.mplot3d import Axes3D
     import matplotlib.pyplot as plt
+
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    camera_point = Trajectory("cube", 0.10, 30)
-    camera_point2 = Trajectory("hemisphere", 0.10, 30)
+    camera_point = Trajectory("cube", 0.10, 30, 10)
+    camera_point2 = Trajectory("hemisphere", 0.10, 30, 20)
 
     print(len(camera_point2.get_coordinate()))
-    for j in camera_point.get_coordinate():
+    print(len(camera_point.get_coordinate()))
+    for j in camera_point2.get_coordinate():
         print(j)
         name_file, x, y, z = j.values()
         ax.scatter(x, y, z)
 
     plt.tight_layout()
     plt.show()
+    
