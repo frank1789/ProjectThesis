@@ -55,5 +55,30 @@ class TestSupportFunction(unittest.TestCase):
     def test_trajectory_shape_string(self):
         self.assertRaises(ValueError, Trajectory, "cone", 0.0, 30, 3)
 
+    def test_trajectory_size_cube(self):
+        camera_point_1 = Trajectory("cube", 0.10, 30, 5)
+        camera_point_2 = Trajectory("cube", 0.10, 30, 10)
+        camera_point_3 = Trajectory("cube", 0.10, 30, 30)
+
+        len_1 = len(camera_point_1.get_coordinate())
+        len_2 = len(camera_point_2.get_coordinate())
+        len_3 = len(camera_point_3.get_coordinate())
+        self.assertEqual(camera_point_1.get_coordinate(), len_1)
+        self.assertEqual(camera_point_2.get_coordinate(), len_2)
+        self.assertEqual(camera_point_3.get_coordinate(), len_3)
+
+    def test_trajectory_size_hempishere(self):
+        camera_point_1 = Trajectory("hemisphere", 0.10, 30, 5)
+        camera_point_2 = Trajectory("hemisphere", 0.10, 30, 10)
+        camera_point_3 = Trajectory("hemisphere", 0.10, 30, 30)
+
+        len_1 = len(camera_point_1.get_coordinate())
+        len_2 = len(camera_point_2.get_coordinate())
+        len_3 = len(camera_point_3.get_coordinate())
+        self.assertEqual(camera_point_1.get_coordinate(), len_1)
+        self.assertEqual(camera_point_2.get_coordinate(), len_2)
+        self.assertEqual(camera_point_3.get_coordinate(), len_3)
+
+
 if __name__ == "__main__":
     unittest.main()
