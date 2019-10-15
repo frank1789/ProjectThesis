@@ -101,6 +101,7 @@ class Trajectory(object):
         if increment < 0.0:
             raise ValueError("Error: increment cannot be a negative number.")
         self.build_shape(shape, lower_limit, upper_limit, step_size, increment)
+        self.__unpack_coordinate()
 
     def build_shape(self, shape, lower, upper, step_size, increment):
         """
@@ -192,19 +193,17 @@ class Trajectory(object):
 
     def get_coordinate(self):
         vect = []
-        point_list = []
         frame = 1
-        point_list.append(self.__unpack_coordinate())
         if self.shape_type is "hemisphere":
             print("==> Centering the points cloud")
             trl_vect = np.array([0, 0, self.highest_value])
-            for point in point_list:
+            for point in self.coordinate:
                 p = Transformation().translate(point, trl_vect).tolist()[0]
                 vect.append(dict(name="IMG{:05d}".format(
                     frame), x=p[0], y=p[1], z=p[2]))
                 frame += 1
         else:
-            for point in point_list:
+            for point in self.coordinate:
                 p = point
                 vect.append(dict(name="IMG{:05d}".format(
                     frame), x=p[0], y=p[1], z=p[2]))
@@ -220,7 +219,7 @@ class Trajectory(object):
         for _x, _y, _z in self.shape:
             for x_i, y_i, z_i in zip(_x, _y, _z):
                 for x_j, y_j, z_j in zip(x_i, y_i, z_i):
-                    return [x_j, y_j, z_j]
+                    self.coordinate.append([x_j, y_j, z_j])
 
 
 if __name__ == "__main__":
@@ -243,4 +242,3 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.show()
 
-    Trajectory("cube", 0.1, 30, 1)
