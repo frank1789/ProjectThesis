@@ -4,7 +4,7 @@
 import unittest
 
 from raspberrycamera import RaspberryPiCamera
-from trajectory import PI, rad2degree, degree2rad
+from trajectory import PI, rad2degree, degree2rad, Trajectory
 
 
 # own test class
@@ -34,6 +34,26 @@ class TestSupportFunction(unittest.TestCase):
     def test_camera_constant_f_number(self):
         self.assertEqual(RaspberryPiCamera().getFnumber(), 2.0)
 
+    def test_trajectory_lower_value(self):
+        self.assertRaises(ValueError, Trajectory, "cube", -15.0, 100.5, -3)
+
+    def test_trajectory_upper_value(self):
+        self.assertRaises(ValueError, Trajectory, "cube", 0.0, -30, -3)
+
+    def test_trajectory_desnity_value(self):
+        self.assertRaises(ValueError, Trajectory, "cube", 0.0, 30, -7)
+
+    def test_trajectory_density_type(self):
+        self.assertRaises(ValueError, Trajectory, "cube", 0.0, 15, 3.5)
+
+    def test_trajectory_step_value(self):
+        self.assertRaises(ValueError, Trajectory, "cube", 0.1, 25, 5, -0.25)
+
+    def test_trajectory_increment_value(self):
+        self.assertRaises(ValueError, Trajectory, "cube", 0.1, 35, 7, 0.25, -1)
+
+    def test_trajectory_shape_string(self):
+        self.assertRaises(ValueError, Trajectory, "cone", 0.0, 30, 3)
 
 if __name__ == "__main__":
     unittest.main()

@@ -90,8 +90,19 @@ class Trajectory(object):
         self.point_list = []
         self.highest_value = 0.0
         self.shape_type = shape
-        assert isinstance(density, int)
+        if density < 1 or type(density) is not int:
+            raise ValueError("Error: density value cannot be negative or float number.")
         self.density = density
+        if lower_limit < 0.0:
+            raise ValueError("Error: lower limit cannot be a negative number.")
+        if upper_limit < 0.0:
+            raise ValueError("Error: upper limit cannot be a negative number.")
+        if density < 1:
+            raise ValueError("Error: density cannot be a zero or negative number.")
+        if step_size < 0.0:
+            raise ValueError("Error: step size cannot be a negative number.")
+        if increment < 0.0:
+            raise ValueError("Error: increment cannot be a negative number.")
         self.build_shape(shape, lower_limit, upper_limit, step_size, increment)
 
     def build_shape(self, shape, lower, upper, step_size, increment):
@@ -117,7 +128,7 @@ class Trajectory(object):
             for r in radius_list:
                 self.shape.append(self.generate_hemisphere(r, self.density))
         elif shape == "cube":
-            print("Generate cube minimum length edge {:3.3f}, maximum length edge{:3.3f}".format(
+            print("Generate cube minimum length edge {:3.3f}, maximum length edge {:3.3f}".format(
                 lower, upper))
             # generates a list with concentric rays
             edges = list(self.incremental_range(
@@ -233,4 +244,5 @@ if __name__ == "__main__":
 
     plt.tight_layout()
     plt.show()
-    
+
+    Trajectory("cube", 0.1, 30, 1)
