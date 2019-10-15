@@ -92,13 +92,13 @@ class Trajectory(object):
         if density < 1 or type(density) is not int:
             raise ValueError("Error: density value cannot be negative or float number.")
         self.density = density
-        if lower_limit < 0.0:
+        if lower_limit < (0.0 or 0):
             raise ValueError("Error: lower limit cannot be a negative number.")
-        if upper_limit < 0.0:
+        if upper_limit < (0.0 or 0):
             raise ValueError("Error: upper limit cannot be a negative number.")
-        if step_size < 0.0:
+        if step_size < (0.0 or 0):
             raise ValueError("Error: step size cannot be a negative number.")
-        if increment < 0.0:
+        if increment < (0.0 or 0):
             raise ValueError("Error: increment cannot be a negative number.")
         self.build_shape(shape, lower_limit, upper_limit, step_size, increment)
         self.__unpack_coordinate()
@@ -229,8 +229,8 @@ if __name__ == "__main__":
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    camera_point = Trajectory("cube", 0.10, 30, 10)
-    camera_point2 = Trajectory("hemisphere", 0.10, 30, 20)
+    camera_point = Trajectory("cube", 0.10, 30.0, 10)
+    camera_point2 = Trajectory("hemisphere", 0.10, 30, 10)
 
     print(len(camera_point2.get_coordinate()))
     print(len(camera_point.get_coordinate()))
