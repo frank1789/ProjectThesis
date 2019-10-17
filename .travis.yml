@@ -14,11 +14,13 @@ install:
 
 before_script:
   - test_file=$(find . -name "test.py")
-  - excluded_file=$(find . -name "camera_action.py")
+  - landing_script=$(find . -name "landingzone.py")
+  - pytest -v ${test_file}
 
 script:
   - coverage report ${test_file}
   - coverage run ${test_file}
+  - coverage run ${landing_script}
 
 after_success:
   - coveralls

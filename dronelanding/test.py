@@ -5,11 +5,10 @@ import unittest
 
 from raspberrycamera import RaspberryPiCamera
 from trajectory import PI, rad2degree, degree2rad, Trajectory
+from utili import hex_to_rgb
 
 
 # own test class
-
-
 class TestSupportFunction(unittest.TestCase):
     def test_rad2degree(self):
         self.assertEqual(rad2degree(0.17453292519943295), 10,
@@ -63,7 +62,8 @@ class TestSupportFunction(unittest.TestCase):
         len_1 = len(camera_point_1.get_coordinate())
         len_2 = len(camera_point_2.get_coordinate())
         len_3 = len(camera_point_3.get_coordinate())
-        self.assertEqual(len(camera_point_1.get_coordinate()), len_1, "should be equal")
+        self.assertEqual(len(camera_point_1.get_coordinate()),
+                         len_1, "should be equal")
         self.assertEqual(len(camera_point_2.get_coordinate()), len_2)
         self.assertEqual(len(camera_point_3.get_coordinate()), len_3)
 
@@ -78,6 +78,38 @@ class TestSupportFunction(unittest.TestCase):
         self.assertEqual(len(camera_point_1.get_coordinate()), len_1)
         self.assertEqual(len(camera_point_2.get_coordinate()), len_2)
         self.assertEqual(len(camera_point_3.get_coordinate()), len_3)
+
+    def test_colour_hex(self):
+        self.assertEqual(hex_to_rgb("#b0ecff"), tuple(map(lambda x: x / 255, [176, 236, 255])),
+                         "should be equal float value")
+        self.assertEqual(hex_to_rgb("#fbeaea"), tuple(map(lambda x: x / 255, [251, 234, 234])),
+                         "should be equal float value")
+        self.assertEqual(hex_to_rgb("#ffffff"), tuple(map(lambda x: x / 255, [255, 255, 255])),
+                         "should be equal float value")
+        self.assertEqual(hex_to_rgb("#bcbcbc"), tuple(map(lambda x: x / 255, [188, 188, 188])),
+                         "should be equal float value")
+
+    def test_trajectory_bad_arguments(self):
+        camera_point = Trajectory("hemisphere", 0.10, 30, 5)
+        with self.assertRaises(ValueError):
+            camera_point.get_coordinate(traslate=[0, 3, 0])
+        with self.assertRaises(ValueError):
+            camera_point.get_coordinate(protate=[0, 3, 0])
+
+    def test_trajectory_translation(self):
+        camera_point = Trajectory("hemisphere", 0.10, 30, 5)
+        for j in camera_point.get_coordinate(translate=[0, 3, 0]):
+            print(j)
+
+    def test_trajectory_rotation(self):
+        camera_point = Trajectory("hemisphere", 0.10, 30, 5)
+        for j in camera_point.get_coordinate(rotate={'axis': "Z", 'angle': PI / 6}):
+            print(j)
+
+    def test_trajectory_rototranslation(self):
+        camera_point = Trajectory("hemisphere", 0.10, 30, 5)
+        for j in camera_point.get_coordinate(translate=[0, 3, 0], rotate={'axis': "Z", 'angle': PI / 6}):
+            print(j)
 
 
 if __name__ == "__main__":

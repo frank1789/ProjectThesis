@@ -8,14 +8,15 @@ if not dir in sys.path:
     sys.path.append(dir)
 
 from raspberrycamera import RaspberryPiCamera
-from trajectory import Trajectory, Transformation
+from trajectory import degree2rad
+from landingzone import SetupSceneObject
 
 
 # setup camera properties
 def setup_camera():
     camera = None
     # check for 1st camera
-    if (len(bpy.data.cameras) == 1):
+    if len(bpy.data.cameras) == 1:
         camera = bpy.data.objects['Camera']
 
     # modify properties
@@ -30,30 +31,42 @@ def setup_output():
     # setup resolution scene output
     bpy.context.scene.render.resolution_x = RaspberryPiCamera().getResolution_x()
     bpy.context.scene.render.resolution_y = RaspberryPiCamera().getResolution_y()
-
     # setup image setting
     bpy.context.scene.render.image_settings.file_format = 'JPEG'
-    
+
 
 if __name__ == '__main__':
     # prepare camera setting as Raspberry Pi camera V2
     camera = setup_camera()
     # generate points cloud
-    traject_points = Trajectory("hemisphere", 0.01, 30, 10)
-    points_cloud = traject_points.get_coordinate()
-    # set end frame
-    bpy.context.scene.frame_end = len(points_cloud)
-    # set position and keyframe
-    for point in points_cloud:
-        name, x, y, z = point.values()
-        # set camera translation
-        camera.location.x = x
-        camera.location.y = y
-        camera.location.z = z
-        # set camera rotation
-        bpy.context.object.rotation_euler[0] = 0
-        bpy.context.object.rotation_euler[1] = 0
-        bpy.context.object.rotation_euler[2] = 0
-        bpy.data.scenes[
-           'Scene'].render.filepath = '//result/{:s}.jpg'.format(name)
+
+    sun = bpy.data.objects['Light']
+
+    obj_mate = bpy.data.objects['CircleLandingZone']
+
+    configuration = SetupSceneObject()
+    for config in configuration.scene:
+        # setup cycle daytime
+        sun.data.energy = config['temp_colour']
+        sun.data.color = tuple(map(lambda x: x / 255, config['color']))
+        # positioning sun at 100m height
+        sun.location[2] = 100.0
+        # set orientation sun
+        sun.rotation_euler[0] = 0.0  # x axis
+        sun.rotation_euler[1] = degree2rad(config['azimut'])  # y axis
+        sun.rotation_euler[2] = config['zenit']  # z axis
+
+        # setup mate landing zone
+
+        # setup camera roto-translation
+        camera.location.x = config['x']
+        camera.location.y = config['y']
+        camera.location.z = config['z']
+        # setup camera rotation
+        camera.rotation_euler[0] = 0.0
+        camera.rotation_euler[1] = 0.0
+        camera.rotation_euler[2] = 0.0
+        # render export and save file
+        savepath = os.path.join('//landingzone', config['filename'])
+        bpy.data.scenes['Scene'].render.filepath = savepath
         bpy.ops.render.render(write_still=True)

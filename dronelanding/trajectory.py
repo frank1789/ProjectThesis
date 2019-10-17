@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import json
 
 # define constant and shortcut
 PI = np.pi
@@ -30,9 +29,9 @@ class Transformation:
     def __init__(self):
         self.M = np.zeros((1, 3))
 
-    def translate(self, vec, offset=np.zeros((3, 3))):
+    def translate(self, vec, offset=np.zeros((1, 3))):
         """
-        Tranlsate 'vect' by a certain offset
+        Translate 'vect' by a certain offset
         :param vec: original point
         :param offset:  arrive point
         :return: translated vector
@@ -91,7 +90,8 @@ class Trajectory(object):
         self.highest_value = 0.0
         self.shape_type = shape
         if density < 1 or type(density) is not int:
-            raise ValueError("Error: density value cannot be negative or float number.")
+            raise ValueError(
+                "Error: density value cannot be negative or float number.")
         self.density = density
         if lower_limit < (0.0 or 0):
             raise ValueError("Error: lower limit cannot be a negative number.")
@@ -182,37 +182,41 @@ class Trajectory(object):
         :param n: (int) number of points that must be generated to fill the previously provided dimensions.
         :return: (np.array) coordinate of each points.
         """
-        _x, _y = np.mgrid[-edge / 2: edge / 2: n * 1j, -edge / 2: edge / 2: n * 1j]
+        _x, _y = np.mgrid[-edge / 2: edge /
+                                     2: n * 1j, -edge / 2: edge / 2: n * 1j]
         _z = np.ones((20, 20)) * edge
         return _x, _y, _z
 
-    def translate(self):
-        print("call translate")
-
-    def rotate(self):
-        print("call rotate")
-
-    def get_coordinate(self):
+    def get_coordinate(self, **kwargs):
         vect = []
         frame = 1
-        if self.shape_type is "hemisphere":
-            print("==> Centering the points cloud")
-            trl_vect = np.array([0, 0, self.highest_value])
-            for point in self.coordinate:
-                p = Transformation().translate(point, trl_vect).tolist()[0]
-                vect.append(dict(name="IMG{:05d}".format(
-                    frame), x=p[0], y=p[1], z=p[2]))
-                frame += 1
-        else:
-            for point in self.coordinate:
-                p = point
-                vect.append(dict(name="IMG{:05d}".format(
-                    frame), x=p[0], y=p[1], z=p[2]))
-                frame += 1
+        p = None
+        for p in self.coordinate:
+            # center hemisphere in (0, 0)
+            if self.shape_type is "hemisphere":
+                p = (lambda x: Transformation().translate(
+                    x, np.array([0, 0, self.highest_value])).tolist()[0])(p)
 
-        # write json for dataset
-        with open("landingdataset.txt", "w") as outfile:
-            json.dump(vect, outfile, indent=4)
+            # apply transformation if in arguments
+            if kwargs.__len__() is not 0:
+                for key, value in kwargs.items():
+                    if key is "translate":
+                        p = (lambda x: Transformation().translate(
+                            x, np.array(value[0:])).tolist()[0])(p)
+                    elif key is "rotate":
+                        axis, angle = value.items()
+                        p = (lambda x, axis, angle: Transformation().rotate(
+                            axis, p, angle).tolist())(np.array(p), axis[1], angle[1])
+                    else:
+                        raise ValueError(
+                            "Error: the argument must be 'translate=[x,y,z]' or 'rotate={'axis':'Z', 'angle':PI/6}'")
+
+            # append value output vector
+            if len(p) < 3:
+                p = [0, 0, p]
+            vect.append(dict(filename="IMG", x=p[0], y=p[1], z=p[2]))
+            frame += 1
+
         return vect
 
     def __unpack_coordinate(self):
@@ -224,25 +228,3 @@ class Trajectory(object):
             for x_i, y_i, z_i in zip(_x, _y, _z):
                 for x_j, y_j, z_j in zip(x_i, y_i, z_i):
                     self.coordinate.append([x_j, y_j, z_j])
-
-
-if __name__ == "__main__":
-    from mpl_toolkits.mplot3d import Axes3D
-    import matplotlib.pyplot as plt
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    camera_point = Trajectory("cube", 0.10, 30.0, 10)
-    camera_point2 = Trajectory("hemisphere", 0.10, 30, 10)
-
-    print(len(camera_point2.get_coordinate()))
-    print(len(camera_point.get_coordinate()))
-    for j in camera_point2.get_coordinate():
-        print(j)
-        name_file, x, y, z = j.values()
-        ax.scatter(x, y, z)
-
-    plt.tight_layout()
-    plt.show()
-
