@@ -20,7 +20,8 @@ before_script:
 script:
   - coverage report ${test_file}
   - coverage run ${test_file}
-  - coverage run ${landing_script}
+  - coverage run - a ${landing_script}
 
 after_success:
+  - coverage report -m
   - coveralls
