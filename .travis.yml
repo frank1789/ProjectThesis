@@ -10,7 +10,7 @@ install:
   - pip install -U pip
   - pip install -U pytest pytest-cov
   - pip install -U coveralls
-  - pip install -U 'numpy>=1.15.4,<1.17.3' --force-reinstall
+  - pip install -U 'numpy>1.15.4,<1.17.3' --force-reinstall
 
 before_script:
   - test_file=$(find . -name "test.py")
@@ -20,7 +20,7 @@ before_script:
 script:
   - coverage report ${test_file}
   - coverage run ${test_file}
-  - coverage run - a ${landing_script}
+  - coverage run -a ${landing_script}
 
 after_success:
   - coverage report -m

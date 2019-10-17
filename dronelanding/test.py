@@ -98,18 +98,15 @@ class TestSupportFunction(unittest.TestCase):
 
     def test_trajectory_translation(self):
         camera_point = Trajectory("hemisphere", 0.10, 30, 5)
-        for j in camera_point.get_coordinate(translate=[0, 3, 0]):
-            print(j)
+        camera_point.get_coordinate(translate=[0, 3, 0])
 
     def test_trajectory_rotation(self):
         camera_point = Trajectory("hemisphere", 0.10, 30, 5)
-        for j in camera_point.get_coordinate(rotate={'axis': "Z", 'angle': PI / 6}):
-            print(j)
+        camera_point.get_coordinate(rotate={'axis': "Z", 'angle': PI / 6})
 
     def test_trajectory_rototranslation(self):
         camera_point = Trajectory("hemisphere", 0.10, 30, 5)
-        for j in camera_point.get_coordinate(translate=[0, 3, 0], rotate={'axis': "Z", 'angle': PI / 6}):
-            print(j)
+        camera_point.get_coordinate(translate=[0, 3, 0], rotate={'axis': "Z", 'angle': PI / 6})
 
 
 if __name__ == "__main__":
