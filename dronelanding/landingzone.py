@@ -23,25 +23,25 @@ class PositionMate(object):
     def __init__(self, model_mate) -> None:
         if model_mate is "RedLanding":
             self.position_landing_zone = [
-                {'position': "road_cross", 'coordinate': (2, 6, 0.065)},
-                {'position': "grass_sidewalk", 'coordinate': (4.97, 19.04, 0.045)},
-                {'position': "grass", 'coordinate': (28.782, 59.297, 0.06)},
-                {'position': "road", 'coordinate': (2, 6, 0.065)},
+                {'position': "road_cross", 'coordinate': (2, 6, 0.12)},
+                {'position': "grass_sidewalk", 'coordinate': (4.97, 19.04, 0.12)},
+                {'position': "grass", 'coordinate': (28.782, 59.297, 0.12)},
+                {'position': "road", 'coordinate': (1.88, 39.54, 0.12)},
             ]
         elif model_mate is "CiterX":
             self.position_landing_zone = [
-                {'position': "road_cross", 'coordinate': (2, 6, 0.065)},
-                {'position': "grass_sidewalk", 'coordinate': (4.97, 19.04, 0.045)},
-                {'position': "grass", 'coordinate': (28.782, 59.297, 0.06)},
-                {'position': "road", 'coordinate': (2, 6, 0.065)},
+                {'position': "road_cross", 'coordinate': (2, 6, 0.12)},
+                {'position': "grass_sidewalk", 'coordinate': (4.97, 19.04, 0.12)},
+                {'position': "grass", 'coordinate': (28.782, 59.297, 0.105)},
+                {'position': "road", 'coordinate': (1.88, 39.54, 0.12)},
             ]
 
         elif model_mate is "GreenSquare":
             self.position_landing_zone = [
-                {'position': "road_cross", 'coordinate': (2, 6, 0.065)},
-                {'position': "grass_sidewalk", 'coordinate': (4.97, 19.04, 0.045)},
-                {'position': "grass", 'coordinate': (28.782, 59.297, 0.06)},
-                {'position': "road", 'coordinate': (2, 6, 0.065)},
+                {'position': "road_cross", 'coordinate': (2, 6, 0.02)},
+                {'position': "grass_sidewalk", 'coordinate': (4.97, 19.04, 0.02)},
+                {'position': "grass", 'coordinate': (28.782, 59.297, 0.002)},
+                {'position': "road", 'coordinate': (2, 6, 0.02)},
             ]
 
     def position(self) -> list:
@@ -49,9 +49,9 @@ class PositionMate(object):
 
 
 class SetupSceneObject(object):
-    def __init__(self):
-        self._camera_trajectory = Trajectory("cube", 0.10, 30, 10)
-        self._position = PositionMate("RedLanding")
+    def __init__(self, model_mate, shape, lower_limit, upper_limit, density, step_size=1.0, increment=1.5):
+        self._camera_trajectory = Trajectory(shape, lower_limit, upper_limit, density, step_size, increment)
+        self._position = PositionMate(model_mate)
         self._daytimecycle = DayTimeCycle().daytime()
         self.scenes = self.__setup_scenes()
 
@@ -84,6 +84,6 @@ class SetupSceneObject(object):
 
 
 if __name__ == '__main__':
-    a = SetupSceneObject()
+    a = SetupSceneObject("RedLanding", "cube", 0.375, 30.0, 5)
     for p in a.get_setup:
         print(p)

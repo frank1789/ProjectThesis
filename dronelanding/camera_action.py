@@ -43,9 +43,10 @@ if __name__ == '__main__':
     sun = bpy.data.objects['Light']
 
     obj_mate = bpy.data.objects['CircleLandingZone']
-
-    configuration = SetupSceneObject()
-    for config in configuration.scene:
+    # enable ambient occlusion
+    bpy.context.scene.eevee.use_gtao = True
+    configuration = SetupSceneObject("RedLanding", "cube", 0.375, 30.0, 5)
+    for config in configuration.get_setup[3490:3500]:
         # setup cycle daytime
         sun.data.energy = config['temp_colour']
         sun.data.color = tuple(map(lambda x: x / 255, config['color']))
@@ -55,9 +56,11 @@ if __name__ == '__main__':
         sun.rotation_euler[0] = 0.0  # x axis
         sun.rotation_euler[1] = degree2rad(config['azimut'])  # y axis
         sun.rotation_euler[2] = config['zenit']  # z axis
-
         # setup mate landing zone
-
+        x, y, z = config['coordinate']
+        obj_mate.location.x = x
+        obj_mate.location.y = y
+        obj_mate.location.z = z
         # setup camera roto-translation
         camera.location.x = config['x']
         camera.location.y = config['y']
@@ -67,6 +70,6 @@ if __name__ == '__main__':
         camera.rotation_euler[1] = 0.0
         camera.rotation_euler[2] = 0.0
         # render export and save file
-        savepath = os.path.join('//landingzone', config['filename'])
+        savepath = os.path.join('//landingzone/t', config['filename'])
         bpy.data.scenes['Scene'].render.filepath = savepath
         bpy.ops.render.render(write_still=True)

@@ -136,7 +136,7 @@ class Trajectory(object):
             print("All radius values: {}, max radius: {}".format(
                 edges, self.highest_value))
             for edge in edges:
-                self.shape.append(self.generate_cube(edge, self.density))
+                self.shape.append(self.generate_cube(lower, edge, self.density))
         else:
             raise ValueError(
                 "Not valid input the shape must be: 'hemisphere', 'cube'.")
@@ -175,16 +175,17 @@ class Trajectory(object):
         return _x, _y, _z
 
     @staticmethod
-    def generate_cube(edge, n):
+    def generate_cube(edge, heigth, n):
         """
         Generate a truncated pyramid.
+        :param heigth:
         :param edge: (float) edge length.
         :param n: (int) number of points that must be generated to fill the previously provided dimensions.
         :return: (np.array) coordinate of each points.
         """
         _x, _y = np.mgrid[-edge / 2: edge /
-                                     2: n * 1j, -edge / 2: edge / 2: n * 1j]
-        _z = np.ones((20, 20)) * edge
+                                     2 : n * 1j, -edge / 2: edge / 2: n * 1j]
+        _z = np.ones((20, 20)) * heigth
         return _x, _y, _z
 
     def get_coordinate(self, **kwargs):
@@ -228,3 +229,26 @@ class Trajectory(object):
             for x_i, y_i, z_i in zip(_x, _y, _z):
                 for x_j, y_j, z_j in zip(x_i, y_i, z_i):
                     self.coordinate.append([x_j, y_j, z_j])
+
+
+if __name__ == '__main__':
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib.pyplot as plt
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    camera_point = Trajectory("cube", 0.375, 30.0, 5)
+    #camera_point2 = Trajectory("hemisphere", 0.10, 30, 10)
+
+    #print(len(camera_point2.get_coordinate()))
+    print(len(camera_point.get_coordinate()))
+    a = dict(axis="X", angle=PI)
+    b = dict(axis="Z", angle=PI / 6)
+    for j in camera_point.get_coordinate():
+        name_file, x, y, z = j.values()
+        ax.scatter(x, y, z)
+
+    plt.tight_layout()
+    plt.show()
+
