@@ -29,8 +29,8 @@ def setup_camera():
 
 def setup_output():
     # setup resolution scene output
-    bpy.context.scene.render.resolution_x = RaspberryPiCamera().getResolution_x()
-    bpy.context.scene.render.resolution_y = RaspberryPiCamera().getResolution_y()
+    bpy.context.scene.render.resolution_x = 512
+    bpy.context.scene.render.resolution_y = 512
     # setup image setting
     bpy.context.scene.render.image_settings.file_format = 'JPEG'
 
@@ -44,9 +44,8 @@ if __name__ == '__main__':
 
     obj_mate = bpy.data.objects['CircleLandingZone']
     # enable ambient occlusion
-    bpy.context.scene.eevee.use_gtao = True
     configuration = SetupSceneObject("RedLanding", "cube", 0.375, 30.0, 5)
-    for config in configuration.get_setup[3490:3500]:
+    for config in configuration.get_setup[3480:3500]:
         # setup cycle daytime
         sun.data.energy = config['temp_colour']
         sun.data.color = tuple(map(lambda x: x / 255, config['color']))
