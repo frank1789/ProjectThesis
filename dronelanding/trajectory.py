@@ -184,7 +184,7 @@ class Trajectory(object):
         :return: (np.array) coordinate of each points.
         """
         _x, _y = np.mgrid[-edge / 2: edge /
-                                     2 : n * 1j, -edge / 2: edge / 2: n * 1j]
+                                     2 : n * 1j, -edge / 2: edge / 2: n * 1j] + np.random.uniform(-5.5, 5.5, size=(5, 5))
         _z = np.ones((20, 20)) * heigth
         return _x, _y, _z
 

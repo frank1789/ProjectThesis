@@ -4,6 +4,7 @@ omit =
     */site-packages/*
     */distutils/*
     */home/travis/virtualenv/*
+    /dronelanding/camera_action.py
 
 
 source=
