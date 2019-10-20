@@ -184,7 +184,9 @@ class Trajectory(object):
         :return: (np.array) coordinate of each points.
         """
         _x, _y = np.mgrid[-edge / 2: edge /
-                                     2 : n * 1j, -edge / 2: edge / 2: n * 1j] + np.random.uniform(-5.5, 5.5, size=(5, 5))
+                                     2 : n * 1j, -edge / 2: edge / 2: n * 1j]
+        _x += np.random.uniform(-0.5, 0.5, size=(n, n))
+        _y += np.random.uniform(-0.5, 0.5, size=(n, n))
         _z = np.ones((20, 20)) * heigth
         return _x, _y, _z
 
@@ -238,7 +240,7 @@ if __name__ == '__main__':
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    camera_point = Trajectory("cube", 0.375, 30.0, 5)
+    camera_point = Trajectory("cube", 0.375, 30.0, 15)
     #camera_point2 = Trajectory("hemisphere", 0.10, 30, 10)
 
     #print(len(camera_point2.get_coordinate()))
