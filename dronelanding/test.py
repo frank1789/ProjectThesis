@@ -108,6 +108,8 @@ class TestSupportFunction(unittest.TestCase):
     def test_trajectory_rototranslation(self):
         camera_point = Trajectory("hemisphere", 0.10, 30, 5)
         camera_point.get_coordinate(translate=[0, 3, 0], rotate={'axis': "Z", 'angle': PI / 6})
+        camera_point.get_coordinate(translate=[0, 3, 0], rotate={'axis': "X", 'angle': PI / 3})
+        camera_point.get_coordinate(translate=[0, 3, 0], rotate={'axis': "Y", 'angle': PI / 35})
 
     def test_landing_zone_genrator(self):
         orange = SetupSceneObject("RedLanding", "cube", 0.375, 30.0, 5)

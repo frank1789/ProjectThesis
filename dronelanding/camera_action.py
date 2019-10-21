@@ -53,6 +53,9 @@ if __name__ == '__main__':
     elif workspace_file == 'square_landing_zone.blend':
         mate_type = "GreenSquare"
         obj_mate = bpy.data.objects['SquareLandingZone']
+    # confiure save path 
+    savepath = os.path.join('//landingzone/t', mate_type)
+    bpy.data.scenes['Scene'].render.filepath = savepath
     # build configuration
     configuration = SetupSceneObject(mate_type, "cube", 0.375, 30.0, 5)
     scene = bpy.context.scene
@@ -83,7 +86,5 @@ if __name__ == '__main__':
             camera.rotation_euler[1] = 0.0
             camera.rotation_euler[2] = 0.0
             # render export and save file
-            #savepath = os.path.join('//landingzone/t', config['filename'])
-            #bpy.data.scenes['Scene'].render.filepath = savepath
             #bpy.ops.render.render(write_still=True)
             ob.keyframe_insert(data_path='location', frame=counterframe)
