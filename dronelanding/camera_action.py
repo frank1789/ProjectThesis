@@ -54,7 +54,7 @@ if __name__ == '__main__':
         mate_type = "GreenSquare"
         obj_mate = bpy.data.objects['SquareLandingZone']
     # confiure save path 
-    savepath = os.path.join('//landingzone/t', mate_type)
+    savepath = os.path.join('//landingzone/{:s}'.format(mate_type), mate_type)
     bpy.data.scenes['Scene'].render.filepath = savepath
     # build configuration
     configuration = SetupSceneObject(mate_type, "cube", 0.375, 30.0, 5)

@@ -184,7 +184,7 @@ class Trajectory(object):
         :return: (np.array) coordinate of each points.
         """
         _x, _y = np.mgrid[-edge/2: edge/2: n * 1j, -edge/2: edge/2: n * 1j]
-        if heigth > 1.5:
+        if heigth > 4:
             factor = heigth/2 * 1.20
             _x += np.random.uniform(-factor, factor, size=(n, n))
             _y += np.random.uniform(-factor, factor, size=(n, n))
