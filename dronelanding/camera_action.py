@@ -38,12 +38,26 @@ def setup_output():
 if __name__ == '__main__':
     # prepare camera setting as Raspberry Pi camera V2
     camera = setup_camera()
-    # generate points cloud
+    # setup sun light
     sun = bpy.data.objects['Light']
-    obj_mate = bpy.data.objects['CircleLandingZone']
-    # enable ambient occlusion
-    configuration = SetupSceneObject("RedLanding", "cube", 0.375, 30.0, 5)
+    # detect configuration
+    mate_type = None
+    obj_mate = None
+    workspace_file = bpy.path.basename(bpy.context.blend_data.filepath)
+    if workspace_file == 'citerx_landing_zone.blend':
+        mate_type = "CiterX"
+        obj_mate = bpy.data.objects['CircleLandingZone']
+    elif workspace_file == 'orange_landing_zone.blend':
+        mate_type = "RedLanding"
+        obj_mate = bpy.data.objects['CircleLandingZone']
+    elif workspace_file == 'square_landing_zone.blend':
+        mate_type = "GreenSquare"
+        obj_mate = bpy.data.objects['SquareLandingZone']
+    # build configuration
+    configuration = SetupSceneObject(mate_type, "cube", 0.375, 30.0, 5)
     scene = bpy.context.scene
+    scene.frame_start = 1
+    scene.frame_end = len(configuration.get_setup)
     for ob in scene.objects:
         for counterframe, config in enumerate(configuration.get_setup):
             # setup cycle daytime

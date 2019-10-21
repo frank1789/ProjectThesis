@@ -23,25 +23,25 @@ class PositionMate(object):
     def __init__(self, model_mate) -> None:
         if model_mate is "RedLanding":
             self.position_landing_zone = [
-                {'position': "road_cross", 'coordinate': (2, 6, 0.12)},
-                {'position': "grass_sidewalk", 'coordinate': (4.97, 19.04, 0.12)},
+                {'position': "road_cross", 'coordinate': (0.74, 6.5, 0.12)},
+                {'position': "grass_sidewalk", 'coordinate': (5.47, 19.04, 0.12)},
                 {'position': "grass", 'coordinate': (28.782, 59.297, 0.12)},
-                {'position': "road", 'coordinate': (1.88, 39.54, 0.12)},
+                {'position': "road", 'coordinate': (1.88, 41.3, 0.12)},
             ]
         elif model_mate is "CiterX":
             self.position_landing_zone = [
-                {'position': "road_cross", 'coordinate': (2, 6, 0.12)},
-                {'position': "grass_sidewalk", 'coordinate': (4.97, 19.04, 0.12)},
-                {'position': "grass", 'coordinate': (28.782, 59.297, 0.105)},
-                {'position': "road", 'coordinate': (1.88, 39.54, 0.12)},
+                {'position': "road_cross", 'coordinate': (0.74, 6.5, 0.12)},
+                {'position': "grass_sidewalk", 'coordinate': (5.47, 19.04, 0.12)},
+                {'position': "grass", 'coordinate': (28.782, 59.297, 0.12)},
+                {'position': "road", 'coordinate': (1.88, 41.3, 0.12)},
             ]
 
         elif model_mate is "GreenSquare":
             self.position_landing_zone = [
-                {'position': "road_cross", 'coordinate': (2, 6, 0.02)},
-                {'position': "grass_sidewalk", 'coordinate': (4.97, 19.04, 0.02)},
-                {'position': "grass", 'coordinate': (28.782, 59.297, 0.002)},
-                {'position': "road", 'coordinate': (2, 6, 0.02)},
+                {'position': "road_cross", 'coordinate': (0.74, 6.5, 0.02)},
+                {'position': "grass_sidewalk", 'coordinate': (5.47, 19.04, 0.02)},
+                {'position': "grass", 'coordinate': (28.782, 59.297, 0.02)},
+                {'position': "road", 'coordinate': (1.88, 41.3, 0.02)},
             ]
 
     def position(self) -> list:
