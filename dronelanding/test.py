@@ -6,6 +6,7 @@ import unittest
 from raspberrycamera import RaspberryPiCamera
 from trajectory import PI, rad2degree, degree2rad, Trajectory
 from utili import hex_to_rgb
+from landingzone import SetupSceneObject
 
 
 # own test class
@@ -107,6 +108,14 @@ class TestSupportFunction(unittest.TestCase):
     def test_trajectory_rototranslation(self):
         camera_point = Trajectory("hemisphere", 0.10, 30, 5)
         camera_point.get_coordinate(translate=[0, 3, 0], rotate={'axis': "Z", 'angle': PI / 6})
+
+    def test_landing_zone_genrator(self):
+        orange = SetupSceneObject("RedLanding", "cube", 0.375, 30.0, 5)
+        citerx = SetupSceneObject("CiterX", "cube", 0.375, 30.0, 5)
+        square = SetupSceneObject("GreenSquare", "cube", 0.375, 30.0, 5)
+        self.assertEqual(len(orange.get_setup), 3500)
+        self.assertEqual(len(citerx.get_setup), 3500)
+        self.assertEqual(len(square.get_setup), 3500)
 
 
 if __name__ == "__main__":

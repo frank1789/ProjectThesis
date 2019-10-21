@@ -82,8 +82,3 @@ class SetupSceneObject(object):
     def get_setup(self) -> list:
         return self.scenes
 
-
-if __name__ == '__main__':
-    a = SetupSceneObject("RedLanding", "cube", 0.375, 30.0, 5)
-    for p in a.get_setup:
-        print(p)
