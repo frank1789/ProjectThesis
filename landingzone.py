@@ -4,6 +4,7 @@
 
 import json
 import os
+import warnings
 
 import numpy as np
 from PIL import Image, ImageDraw
@@ -11,7 +12,7 @@ from PIL import Image, ImageDraw
 from mrcnn import model as modellib
 from mrcnn import utils
 from mrcnn.config import Config
-import warnings
+
 warnings.filterwarnings('ignore', category=FutureWarning)
 # suppress warning and error message tf
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -65,7 +66,7 @@ class LandingZoneDataset(utils.Dataset):
         Load COCO like dataset from json.
         Parameters
         ----------
-        annotaions_dir : str
+        annotations_dir : str
             path to the coco annotations json file
         images_dir : str
             the folder path contains images related to the json file
