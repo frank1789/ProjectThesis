@@ -15,7 +15,7 @@ before_script:
   - python3 setup.py install
   - landing_script=$(find . -name "landingzone.py")
   - python3 downloadmanager.py
-  - unzip dataset.zip
+  - unzip dataset.zip Source -x "*.DS_Store" -x "__MACOSX"
   - echo "Serching for datasetfolder"
   - datasetpath=$(find $PWD -name "landingzone")
   - echo "found dataset folder at ${datasetpath}"
