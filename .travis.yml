@@ -24,7 +24,6 @@ before_script:
   - echo "found dataset annotaions at ${datasetannotations}"
 
 script:
-  - coverage run ${test_file}
   - coverage run -a ${landing_script} -a ${datasetannotations} -d ${datasetpath} --weights=coco
 
 after_success:

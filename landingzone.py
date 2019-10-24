@@ -5,9 +5,16 @@ import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 import json
 import os
+import sys
 
 import numpy as np
 from PIL import Image, ImageDraw
+
+# Root directory of the project
+ROOT_DIR = os.path.abspath("../../")
+
+# Import Mask RCNN
+sys.path.append(ROOT_DIR)  # To find local version of the library
 
 from mrcnn import model as modellib
 from mrcnn import utils
@@ -238,10 +245,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Train Mask R-CNN to detect landing zone mate.')
     parser.add_argument('-a', '--annotations', required=True,
-                        metavar="/path/to/balloon/dataset/annotations.json",
+                        metavar="/path/to/dataset/annotations.json",
                         help='Path to annotations json file')
     parser.add_argument('-d', '--dataset', required=True,
-                        metavar="/path/to/balloon/dataset/",
+                        metavar="/path/to/dataset/",
                         help='Directory dataset')
     parser.add_argument('--weights', required=True,
                         metavar="/path/to/weights.h5",
