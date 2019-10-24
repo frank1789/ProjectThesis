@@ -18,7 +18,8 @@ before_script:
   - unzip dataset.zip
   # clean files
   - find . -type f -name '._*' -delete
-  - find . -type d -name '__MACOSX' -delete
+  - delfolder=$(find . -type d -name '__MACOSX')
+  - rm -rf ${delfolder}
   # get paths for file and folder
   - echo "Serching for datasetfolder"
   - datasetpath=$(find $PWD -name "landingzone")
