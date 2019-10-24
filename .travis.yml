@@ -8,7 +8,7 @@ install:
   - python --version
   - pip install -U pip
   - pip install -U pytest pytest-cov
-  - pip install -U coveralls
+  - pip install -U coveralls tqdm
   - pip install -r requirements.txt
 
 before_script:
