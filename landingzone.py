@@ -50,7 +50,7 @@ class LandingZoneConfig(Config):
     IMAGES_PER_GPU = 2
 
     # Number of class
-    NUM_CLASSES = 1 + 2  # background + square mate + circular mate
+    NUM_CLASSES = 1 + 1  # background + landing mate
 
     # Number of train steps per epoch
     STEPS_PER_EPOCH = 500
