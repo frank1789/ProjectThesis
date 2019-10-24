@@ -2,21 +2,32 @@
 # -*- coding: utf-8 -*-
 
 
-import os
 import json
-import skimage
+import os
+
 import numpy as np
-import time
 from PIL import Image, ImageDraw
 
-
+from mrcnn import model as modellib
+from mrcnn import utils
 from mrcnn.config import Config
-import mrcnn.utils as utils
-from mrcnn import visualize
-import mrcnn.model as modellib
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
+# suppress warning and error message tf
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-import utils
-from config import Config
+##############################################################################
+# Constant path model
+##############################################################################
+# Directory to save logs and trained model
+MODEL_DIR = os.path.join(os.getcwd(), "logs")
+
+# Local path to trained weights file
+COCO_MODEL_PATH = os.path.join(os.getcwd(), "mask_rcnn_coco.h5")
+
+# Download COCO trained weights from Releases if needed
+if not os.path.exists(COCO_MODEL_PATH):
+    utils.download_trained_weights(COCO_MODEL_PATH)
 
 
 class LandingZoneConfig(Config):
@@ -161,7 +172,6 @@ def train(model) -> None:
     dataset_val.load_landingzone(path, images_path)
     dataset_val.prepare()
 
-
     # Train the head branches
     # Passing layers="heads" freezes all layers except the head
     # layers. You can also pass a regular expression to select
@@ -171,20 +181,6 @@ def train(model) -> None:
                 learning_rate=config.LEARNING_RATE,
                 epochs=30,
                 layers='heads')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     # # visualize
     # dataset = dataset_train
@@ -212,8 +208,8 @@ if __name__ == '__main__':
         # are different due to the different number of classes
         # See README for instructions to download the COCO weights
         model.load_weights(COCO_MODEL_PATH, by_name=True, exclude=[
-                           "mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
-    elif init_with == "last":
+            "mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
+    elif init_with_weights == "last":
         # Load the last model you trained and continue training
         model.load_weights(model.find_last(), by_name=True)
 
@@ -232,9 +228,3 @@ if __name__ == '__main__':
     # 2. Fine-tune all layers. For this simple example it's not necessary, but we're
     #  including it to show the process. Simply pass layers="all to train all layers.
     train(model)
-
-
-
-
-
-
