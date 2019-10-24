@@ -1,10 +1,10 @@
 #!usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
 import json
 import os
-import warnings
 
 import numpy as np
 from PIL import Image, ImageDraw
@@ -13,7 +13,7 @@ from mrcnn import model as modellib
 from mrcnn import utils
 from mrcnn.config import Config
 
-warnings.filterwarnings('ignore', category=FutureWarning)
+
 # suppress warning and error message tf
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
@@ -24,11 +24,11 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 MODEL_DIR = os.path.join(os.getcwd(), "logs")
 
 # Local path to trained weights file
-COCO_MODEL_PATH = os.path.join(os.getcwd(), "mask_rcnn_coco.h5")
+COCO_WEIGHTS_PATH = os.path.join(os.getcwd(), "mask_rcnn_coco.h5")
 
-# Download COCO trained weights from Releases if needed
-if not os.path.exists(COCO_MODEL_PATH):
-    utils.download_trained_weights(COCO_MODEL_PATH)
+# Directory to save logs and model checkpoints, if not provided
+# through the command line argument --logs
+DEFAULT_LOGS_DIR = os.path.join(os.getcwd(), "logs")
 
 
 class LandingZoneConfig(Config):
@@ -163,15 +163,15 @@ class LandingZoneDataset(utils.Dataset):
         return mask, class_ids
 
 
-def train(model) -> None:
+def train(args, model) -> None:
     """
     Train the model
     :param model:
     :return:
     """
     # training dataset
-    path = "/Users/francesco/Desktop/landingzone/annotations.json"
-    images_path = "/Users/francesco/Desktop/landingzone/"
+    path = args.annotations
+    images_path = args.dataset
     dataset_train = LandingZoneDataset()
     dataset_train.load_landingzone(path, images_path)
     dataset_train.prepare()
@@ -201,27 +201,62 @@ def train(model) -> None:
     #         image, mask, class_ids, dataset.class_names)
 
 
+def init_weights(args, model):
+    # weights_path = None
+    # Select weights file to load
+    if args.weights.lower() == "coco":
+        weights_path = COCO_WEIGHTS_PATH
+        # Download weights file
+        if not os.path.exists(weights_path):
+            utils.download_trained_weights(weights_path)
+    elif args.weights.lower() == "last":
+        # Find last trained weights
+        weights_path = model.find_last()
+    elif args.weights.lower() == "imagenet":
+        # Start from ImageNet trained weights
+        weights_path = model.get_imagenet_weights()
+    else:
+        weights_path = args.weights
+
+    # Load weights
+    print("Loading weights ", weights_path)
+    if args.weights.lower() == "coco":
+        # Exclude the last layers because they require a matching
+        # number of classes
+        model.load_weights(weights_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
+    else:
+        model.load_weights(weights_path, by_name=True)
+
+    return model
+
+
 if __name__ == '__main__':
+    import argparse
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description='Train Mask R-CNN to detect landing zone mate.')
+    parser.add_argument('-a', '--annotations', required=True,
+                        metavar="/path/to/balloon/dataset/annotations.json",
+                        help='Path to annotations json file')
+    parser.add_argument('-d', '--dataset', required=True,
+                        metavar="/path/to/balloon/dataset/",
+                        help='Directory dataset')
+    parser.add_argument('--weights', required=True,
+                        metavar="/path/to/weights.h5",
+                        help="Path to weights .h5 file or 'coco'")
+    parser.add_argument('--logs', required=False,
+                        default=DEFAULT_LOGS_DIR,
+                        metavar="/path/to/logs/",
+                        help='Logs and checkpoints directory (default=logs/)')
+    args = parser.parse_args()
+    # initialize configuration
     config = LandingZoneConfig()
     config.display()
-
     # create model in training mode
-    model = modellib.MaskRCNN(
-        mode="training", config=config, model_dir=MODEL_DIR)
-    # init weights
-    init_with_weights = "coco"
-    if init_with_weights == "imagenet":
-        model.load_weights(model.get_imagenet_weights(), by_name=True)
-    elif init_with_weights == "coco":
-        # Load weights trained on MS COCO, but skip layers that
-        # are different due to the different number of classes
-        # See README for instructions to download the COCO weights
-        model.load_weights(COCO_MODEL_PATH, by_name=True, exclude=[
-            "mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
-    elif init_with_weights == "last":
-        # Load the last model you trained and continue training
-        model.load_weights(model.find_last(), by_name=True)
-
+    model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
+    model = init_weights(args, model)
     ##############################################################################
     #    Training                                                                #
     ##############################################################################
@@ -234,4 +269,4 @@ if __name__ == '__main__':
     #
     # 2. Fine-tune all layers. For this simple example it's not necessary, but we're
     #  including it to show the process. Simply pass layers="all to train all layers.
-    train(model)
+    train(args, model)
