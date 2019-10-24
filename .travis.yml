@@ -1,0 +1,32 @@
+language: python
+
+python:
+  - 3.6
+  - 3.7
+
+install:
+  - python --version
+  - pip install -U pip
+  - pip install -U pytest pytest-cov
+  - pip install -U coveralls
+  - pip install -r requirements.txt
+
+before_script:
+  - python3 setup.py install
+  - landing_script=$(find . -name "landingzone.py")
+  - python3 downloadmanager.py
+  - unzip dataset.zip
+  - echo "Serching for datasetfolder"
+  - datasetpath=$(find $PWD -name "landingzone")
+  - echo "found dataset folder at ${datasetpath}"
+  - echo "Searching for annotations file"
+  - datasetannotations=$(find $PWD -name "annotations.json")
+  - echo "found dataset annotaions at ${datasetannotations}"
+
+script:
+  - coverage run ${test_file}
+  - coverage run -a ${landing_script} -a ${datasetannotations} -d ${datasetpath} --weights=coco
+
+after_success:
+  - coverage report -m
+  - coveralls
