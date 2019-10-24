@@ -31,6 +31,11 @@ from distutils.version import LooseVersion
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
 
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
+# suppress warning and error message tf
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 
 ############################################################
 #  Utility Functions

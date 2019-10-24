@@ -18,6 +18,11 @@ import keras.backend as K
 import keras.layers as KL
 import keras.models as KM
 
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
+# suppress warning and error message tf
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 
 class ParallelModel(KM.Model):
     """Subclasses the standard Keras Model and adds multi-GPU support.

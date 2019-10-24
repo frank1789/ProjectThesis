@@ -45,10 +45,18 @@ class LandingZoneConfig(Config):
     NUM_CLASSES = 1 + 2  # background + square mate + circular mate
 
     # Number of train steps per epoch
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 500
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
+
+    # All of our training images are 512x512
+    IMAGE_MIN_DIM = 512
+    IMAGE_MAX_DIM = 512
+
+    # This is how often validation is run. If you are using too much hard drive space
+    # on saved models (in the MODEL_DIR), try making this value larger.
+    VALIDATION_STEPS = 5
 
 
 class LandingZoneDataset(utils.Dataset):
@@ -214,9 +222,7 @@ if __name__ == '__main__':
         model.load_weights(model.find_last(), by_name=True)
 
     ##############################################################################
-    #                                                                            #
     #    Training                                                                #
-    #                                                                            #
     ##############################################################################
     #
     # Train in two stages:
