@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import warnings
+
 warnings.filterwarnings('ignore', category=FutureWarning)
 import json
 import os
@@ -19,6 +20,13 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn import model as modellib
 from mrcnn import utils
 from mrcnn.config import Config
+
+import signal
+
+
+def handler(signum, frame):
+    print("Times up! Exiting...")
+    exit(0)
 
 
 # suppress warning and error message tf
@@ -241,6 +249,7 @@ def init_weights(args, model):
 
 if __name__ == '__main__':
     import argparse
+
     # Parse command line arguments
     parser = argparse.ArgumentParser(
         description='Train Mask R-CNN to detect landing zone mate.')
@@ -258,6 +267,10 @@ if __name__ == '__main__':
                         metavar="/path/to/logs/",
                         help='Logs and checkpoints directory (default=logs/)')
     args = parser.parse_args()
+    # Install signal handler
+    signal.signal(signal.SIGALRM, handler)
+    # Set alarm for 5 minutes
+    signal.alarm(300)
     # initialize configuration
     config = LandingZoneConfig()
     config.display()
