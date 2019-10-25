@@ -4,6 +4,9 @@ python:
   - 3.6
   - 3.7
 
+env:
+  - PARALLELIZE=true
+
 install:
   - python --version
   - pip install -U pip
@@ -27,9 +30,11 @@ before_script:
   - echo "Searching for annotations file"
   - datasetannotations=$(find $PWD -name "annotations.json")
   - echo "found dataset annotaions at ${datasetannotations}"
+  # install package
+  -  python3 setup.py install
 
 script:
-  - coverage run ${landing_script} -a ${datasetannotations} -d ${datasetpath} --weights=coco
+  - coverage run ${landing_script} --annotations ${datasetannotations} -dataset ${datasetpath} --weights=coco
 
 after_success:
   - coverage report -m

@@ -58,7 +58,7 @@ echo "found dataset annotaions at ${datasetannotations}"
 echo "Updating source . . ."
 src=$(find $PWD -name "ProjectThesis")
 rm -rf src
-git clone -b feature/newcnn https://github.com/frank1789/ProjectThesis.git
+git clone -b develop https://github.com/frank1789/ProjectThesis.git
 echo "Done"
 echo
 # launch script python
