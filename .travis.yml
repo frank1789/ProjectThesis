@@ -34,7 +34,7 @@ before_script:
   -  python3 setup.py install
 
 script:
-  - coverage run ${landing_script} --annotations ${datasetannotations} -dataset ${datasetpath} --weights=coco
+  - coverage run ${landing_script} --annotations ${datasetannotations} --dataset ${datasetpath} --weights=coco
 
 after_success:
   - coverage report -m
