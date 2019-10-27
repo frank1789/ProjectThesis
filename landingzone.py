@@ -1,14 +1,18 @@
 #!usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import signal
+from mrcnn.config import Config
+from mrcnn import utils
+from mrcnn import model as modellib
+from PIL import Image, ImageDraw
+import numpy as np
+import sys
+import os
+import json
 import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
-import json
-import os
-import sys
 
-import numpy as np
-from PIL import Image, ImageDraw
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -16,9 +20,10 @@ ROOT_DIR = os.path.abspath("../../")
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
 
-from mrcnn import model as modellib
-from mrcnn import utils
-from mrcnn.config import Config
+
+def handler(signum, frame):
+    print("Times up! Exiting...")
+    exit(0)
 
 
 # suppress warning and error message tf
@@ -258,11 +263,16 @@ if __name__ == '__main__':
                         metavar="/path/to/logs/",
                         help='Logs and checkpoints directory (default=logs/)')
     args = parser.parse_args()
+    # Install signal handler
+    signal.signal(signal.SIGALRM, handler)
+    # Set alarm for 5 minutes
+    signal.alarm(300)
     # initialize configuration
     config = LandingZoneConfig()
     config.display()
     # create model in training mode
-    model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
+    model = modellib.MaskRCNN(
+        mode="training", config=config, model_dir=MODEL_DIR)
     model = init_weights(args, model)
     ##############################################################################
     #    Training                                                                #
