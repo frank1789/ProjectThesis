@@ -9,15 +9,14 @@ addons:
       - docker-ce
 
 service:
-- docker
+  - docker
 
 cache:
   directories:
-  - /home/travis/docker/
-
+    - /home/travis/docker/
 
 before_install:
-  - docker build -t unitntest .
+  - make build
 
-script:
-- docker run -it -v ${PWD}:/training_model unitntest
+after_success:
+  - make push
