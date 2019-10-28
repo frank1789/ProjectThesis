@@ -10,7 +10,7 @@ build:
 	docker build -t ${IMG} .
 	docker tag ${IMG} ${LATEST}
 
-push:
+push: login
 	docker push ${NAME}
 
 login:

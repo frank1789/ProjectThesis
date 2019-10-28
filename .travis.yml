@@ -18,5 +18,8 @@ cache:
 before_install:
   - make build
 
+script:
+  - docker run -it -v ${PWD}:/training_model francescsco/cnn-singularity:latest
+
 after_success:
   - make push
