@@ -2,7 +2,7 @@
 
 
 NAME   := francescsco/cnn-singularity
-TAG    := $$(git log -1 --pretty=%!H(MISSING))
+TAG    := v0.0.1
 IMG    := ${NAME}\:${TAG}
 LATEST := ${NAME}\:latest
 
