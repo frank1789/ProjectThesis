@@ -28,40 +28,21 @@
 module avail
 
 # load moudle
-module load python-3.5.2 cuda-9.0
+module load python-3.5.2 cuda-9.0 singularity
 
 # show loaded module
 module list
 
-echo
-echo --- launch Python3 script --- ###
-echo
-
-# check package
-echo
-echo -------------------------------------
-echo display avaiable package
-echo
-pip3 freeze list
-echo
-echo -------------------------------------
-echo
-
-echo "Serching for datasetfolder"
-datasetpath=$(find $PWD -name "landingzone")
-echo "found dataset folder at ${datasetpath}"
-echo "Searching for annotations file"
-datasetannotations=$(find $PWD -name "annotations.json")
-echo "found dataset annotaions at ${datasetannotations}"
-
 # update src
+echo
 echo "Updating source . . ."
 src=$(find $PWD -name "ProjectThesis")
 rm -rf src
 git clone -b develop https://github.com/frank1789/ProjectThesis.git
 echo "Done"
 echo
-# launch script python
 # environment variable
 export HDF5_USE_FILE_LOCKING=FALSE
+cd ProjectThesis
+singularity exec --nv docker:// sos / myimage
 python3 /home/francesco.argentieri/ProjectThesis/landingzone.py ${datasetannotations} ${datasetpath}
