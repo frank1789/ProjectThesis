@@ -20,6 +20,9 @@ ROOT_DIR = os.path.abspath("../../")
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
 
+# check if travis environment
+is_travis = 'TRAVIS' in os.environ
+print("Running on travis: ", is_travis)
 
 def handler(signum, frame):
     print("Times up! Exiting...")
