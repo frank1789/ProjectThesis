@@ -10,4 +10,5 @@ keras-preprocessing>=1.1.0
 opencv-python
 h5py
 imgaug
-IPython[all]
+jupyter 
+ipython
