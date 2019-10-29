@@ -19,7 +19,8 @@ before_install:
   - make build
 
 script:
-  - docker run -it -v ${PWD}:/training_model francescsco/cnn-singularity:latest
+  - coverage run ${landing_script} --annotations ${datasetannotations} --dataset ${datasetpath} --weights=coco
+  - coverage run -a ${landing_script} --annotations ${datasetannotations} --dataset ${datasetpath} --weights=imagenet
 
 after_success:
   - make push

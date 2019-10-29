@@ -11,6 +11,7 @@ import sys
 import os
 import json
 import warnings
+
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 
@@ -23,6 +24,13 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 # check if travis environment
 is_travis = 'TRAVIS' in os.environ
 print("Running on travis: ", is_travis)
+
+def handler(signum, frame):
+    print("Times up! Exiting...")
+    exit(0)
+
+import signal
+
 
 def handler(signum, frame):
     print("Times up! Exiting...")
@@ -203,7 +211,7 @@ def train(args, model) -> None:
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=30,
+                epochs=1,
                 layers='heads')
 
     # # visualize
@@ -249,6 +257,7 @@ def init_weights(args, model):
 
 if __name__ == '__main__':
     import argparse
+
     # Parse command line arguments
     parser = argparse.ArgumentParser(
         description='Train Mask R-CNN to detect landing zone mate.')
