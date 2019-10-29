@@ -28,21 +28,69 @@
 module avail
 
 # load moudle
-module load python-3.5.2 cuda-9.0 singularity
+module load python-3.5.2 cuda-9.0
 
 # show loaded module
 module list
 
-# update src
+##############################################################################
+# setup environmnet
+##############################################################################
 echo
 echo "Updating source . . ."
-src=$(find $PWD -name "ProjectThesis")
-rm -rf src
+rm -rf $(find $PWD -name "ProjectThesis")
 git clone -b develop https://github.com/frank1789/ProjectThesis.git
 echo "Done"
 echo
+cd ProjectThesis
+echo "Enter project folder: " $PWD
+echo "Create folder for virtual environment"
+mkdir virtualproject
+cd virtualproject
+echo "Enter virtual env folder: " $PWD
+python3 -m venv project_venv
+source project_venv/bin/activate
+cd ..
+echo "Enter project folder: " $PWD
+echo "Install requirements . . ."
+which pip
+which python3
+echo
+pip install -r requirements.txt
+pip install tqdm
+
+##############################################################################
+# Prepare dataset
+##############################################################################
+# Download dataset
+python3 downloadmanager.py
+
+# clean from from garbage files
+unzip dataset.zip
+find . -type f -name '._*' -delete
+delfolder=$(find . -type d -name '__MACOSX')
+rm -rf ${delfolder}
+
+# search folder and files
+echo "Serching for datasetfolder"
+datasetpath=$(find $PWD -name "landingzone")
+echo "found dataset folder at ${datasetpath}"
+echo "Searching for annotations file"
+datasetannotations=$(find $PWD -name "annotations.json")
+echo "found dataset annotaions at ${datasetannotations}"
+echo
+
+##############################################################################
+# Training
+##############################################################################
+python3 setup.py install
 # environment variable
 export HDF5_USE_FILE_LOCKING=FALSE
-cd ProjectThesis
-singularity exec --nv docker:// sos / myimage
-python3 /home/francesco.argentieri/ProjectThesis/landingzone.py ${datasetannotations} ${datasetpath}
+# launch script python
+python3 landingzone.py -a ${datasetannotations} -d ${datasetpath} --weights=coco
+
+##############################################################################
+# deactivate virtual env
+##############################################################################
+deactivate
+
