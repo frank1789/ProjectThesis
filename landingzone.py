@@ -36,6 +36,8 @@ def handler(signum, frame):
     print("Times up! Exiting...")
     exit(0)
 
+is_travis = 'TRAVIS' in os.environ
+
 
 # suppress warning and error message tf
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -275,10 +277,14 @@ if __name__ == '__main__':
                         metavar="/path/to/logs/",
                         help='Logs and checkpoints directory (default=logs/)')
     args = parser.parse_args()
-    # Install signal handler
-    signal.signal(signal.SIGALRM, handler)
-    # Set alarm for 5 minutes
-    signal.alarm(300)
+    
+    # check existence of travis then install signal handler
+    if is_travis:
+        print("work on travis: ", is_travis)
+        signal.signal(signal.SIGALRM, handler)
+        # Set alarm for 5 minutes
+        signal.alarm(300)
+    
     # initialize configuration
     config = LandingZoneConfig()
     config.display()
@@ -286,10 +292,10 @@ if __name__ == '__main__':
     model = modellib.MaskRCNN(
         mode="training", config=config, model_dir=MODEL_DIR)
     model = init_weights(args, model)
+    
     ##############################################################################
     #    Training                                                                #
     ##############################################################################
-    #
     # Train in two stages:
     # 1. Only the heads. Here we're freezing all the backbone layers and training
     # only the randomly initialized layers (i.e. the ones that we didn't use
