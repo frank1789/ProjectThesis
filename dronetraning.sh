@@ -53,13 +53,13 @@ source project_venv/bin/activate
 cd ..
 echo "Enter project folder: " $PWD
 echo "Install requirements . . ."
-which pip3
+which pip
 which python3
 echo
-python3 -m pip install -U pip
-pip3 install -r requirements.txt
-pip3 install tqdm requests scipy 'tensorflow-gpu>=1.3.0,<=1.13.1'
-pip3 list
+pip install -U pip
+pip install -r requirements.txt
+pip install -U tqdm requests scipy 'tensorflow-gpu>=1.3.0,<=1.11.0'
+pip list
 
 ##############################################################################
 # Prepare dataset
