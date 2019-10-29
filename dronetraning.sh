@@ -88,7 +88,8 @@ echo
 ##############################################################################
 # Training
 ##############################################################################
-python3 setup.py install
+echo "start training"
+#python3 setup.py install
 # environment variable
 export HDF5_USE_FILE_LOCKING=FALSE
 # launch script python
