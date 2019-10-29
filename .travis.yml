@@ -2,25 +2,38 @@ language: python
 
 python:
   - 3.6
+  - 3.7
 
-addons:
-  apt:
-    packages:
-      - docker-ce
+install:
+  - python --version
+  - pip install -U pip
+  - pip install -U pytest pytest-cov
+  - pip install -U coveralls tqdm
+  - pip install -r requirements.txt
 
-service:
-  - docker
-
-cache:
-  directories:
-    - /home/travis/docker/
-
-before_install:
-  - make build
+before_script:
+  # prepare dataset: download and unzip
+  - landing_script=$(find . -name "landingzone.py")
+  - python3 downloadmanager.py
+  - unzip dataset.zip
+  # clean files
+  - find . -type f -name '._*' -delete
+  - delfolder=$(find . -type d -name '__MACOSX')
+  - rm -rf ${delfolder}
+  # get paths for file and folder
+  - echo "Serching for datasetfolder"
+  - datasetpath=$(find $PWD -name "landingzone")
+  - echo "found dataset folder at ${datasetpath}"
+  - echo "Searching for annotations file"
+  - datasetannotations=$(find $PWD -name "annotations.json")
+  - echo "found dataset annotaions at ${datasetannotations}"
+  # install package
+  -  python3 setup.py install
 
 script:
   - coverage run ${landing_script} --annotations ${datasetannotations} --dataset ${datasetpath} --weights=coco
   - coverage run -a ${landing_script} --annotations ${datasetannotations} --dataset ${datasetpath} --weights=imagenet
 
 after_success:
-  - make push
+  - coverage report -m
+  - coveralls
