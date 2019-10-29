@@ -1,6 +1,6 @@
 | Develop build | Develop coverage | 3D-environment build | 3D-environment coverage |
 | :-------------: | :----------------: | :--------------------: | :-----------------------: |
-|[![Build Status](https://img.shields.io/travis/frank1789/ProjectThesis/develop)](https://travis-ci.org/frank1789/ProjectThesis)|[![Coverage Status](https://coveralls.io/repos/github/frank1789/ProjectThesis/badge.svg?branch=develop)](https://coveralls.io/github/frank1789/ProjectThesis?branch=feature/test)|[![Build Status](https://img.shields.io/travis/frank1789/ProjectThesis/3D-environment?style=flat-square)](https://travis-ci.org/frank1789/ProjectThesis)|[![Coverage Status](https://coveralls.io/repos/github/frank1789/ProjectThesis/badge.svg?branch=3D-environment)](https://coveralls.io/github/frank1789/ProjectThesis?branch=3D-environment)|
+|[![Build Status](https://img.shields.io/travis/frank1789/ProjectThesis/develop)](https://travis-ci.org/frank1789/ProjectThesis)|[![Coverage Status](https://coveralls.io/repos/github/frank1789/ProjectThesis/badge.svg?branch=develop)](https://coveralls.io/github/frank1789/ProjectThesis?branch=feature/test)|[![Build Status](https://img.shields.io/travis/frank1789/ProjectThesis/3D-environment)](https://travis-ci.org/frank1789/ProjectThesis)|[![Coverage Status](https://coveralls.io/repos/github/frank1789/ProjectThesis/badge.svg?branch=3D-environment)](https://coveralls.io/github/frank1789/ProjectThesis?branch=3D-environment)|
 
 # Project
 This project is based on the Mask_RCNN code

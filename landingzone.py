@@ -23,7 +23,6 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 
 # check if travis environment
 is_travis = 'TRAVIS' in os.environ
-print("Running on travis: ", is_travis)
 
 def handler(signum, frame):
     print("Times up! Exiting...")
@@ -35,9 +34,6 @@ import signal
 def handler(signum, frame):
     print("Times up! Exiting...")
     exit(0)
-
-is_travis = 'TRAVIS' in os.environ
-
 
 # suppress warning and error message tf
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
