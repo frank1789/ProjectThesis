@@ -4,3 +4,4 @@ omit =
     */site-packages/*
     */distutils/*
     */home/travis/virtualenv/*
+   	*/mrcnn/*

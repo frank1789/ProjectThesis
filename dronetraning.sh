@@ -53,12 +53,11 @@ source project_venv/bin/activate
 cd ..
 echo "Enter project folder: " $PWD
 echo "Install requirements . . ."
-which pip
+which pip3
 which python3
 echo
-pip install -U pip
-pip install -r requirements.txt
-pip install tqdm
+pip3 install -r requirements.txt
+pip3 install tqdm requests 'tensorflow-gpu>=1.3.0,<=1.13.1'
 
 ##############################################################################
 # Prepare dataset
@@ -67,7 +66,7 @@ pip install tqdm
 python3 downloadmanager.py
 
 # clean from from garbage files
-unzip dataset.zip
+unzip -qq dataset.zip
 find . -type f -name '._*' -delete
 delfolder=$(find . -type d -name '__MACOSX')
 rm -rf ${delfolder}

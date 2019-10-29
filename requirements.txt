@@ -5,10 +5,10 @@ cython
 matplotlib
 scikit-image
 tensorflow>=1.3.0,<=1.13.1
-tensorflow-gpu>=1.3.0,<=1.13.1
 keras==2.2.5
-keras-preprocessing>=1.0.3
+keras-preprocessing>=1.1.0
 opencv-python
 h5py
 imgaug
-IPython[all]
+jupyter 
+ipython
