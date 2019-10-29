@@ -15,7 +15,7 @@ before_script:
   # prepare dataset: download and unzip
   - landing_script=$(find . -name "landingzone.py")
   - python3 downloadmanager.py
-  - unzip dataset.zip
+  - unzip -qq dataset.zip
   # clean files
   - find . -type f -name '._*' -delete
   - delfolder=$(find . -type d -name '__MACOSX')

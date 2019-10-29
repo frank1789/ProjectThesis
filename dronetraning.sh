@@ -28,7 +28,7 @@
 module avail
 
 # load moudle
-module load python-3.5.2 cuda-9.0
+module load python-3.7.2 cuda-9.0
 
 # show loaded module
 module list
