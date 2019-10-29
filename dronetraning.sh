@@ -56,9 +56,8 @@ echo "Install requirements . . ."
 which pip
 which python3
 echo
-pip install -U pip
 pip install -r requirements.txt
-pip install -U tqdm requests scipy 'tensorflow-gpu>=1.3.0,<=1.11.0'
+pip install -U tqdm requests scipy 'tensorflow-gpu==1.11.0'
 pip list
 
 ##############################################################################

@@ -45,7 +45,9 @@ def save_response_content(response, destination):
         for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
             f.write(chunk)
             pbar.update(len(chunk))
-    # t.close()
+    pbar.close()
+    print("\n")
+    
 
 
 if __name__ == "__main__":
