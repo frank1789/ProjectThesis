@@ -19,10 +19,10 @@
 # send mail when start and end job
 #PBS -m be
 # write error log
-#PBS -e error_dronelanding.log
+#PBS -e error_dronelanding372.log
 
 # write out log
-#PBS -o result_dronelanding.log
+#PBS -o result_dronelanding372.log
 
 # show module
 module avail

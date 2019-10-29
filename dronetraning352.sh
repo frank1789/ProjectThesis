@@ -19,10 +19,10 @@
 # send mail when start and end job
 #PBS -m be
 # write error log
-#PBS -e error_dronelanding.log
+#PBS -e error_dronelanding352.log
 
 # write out log
-#PBS -o result_dronelanding.log
+#PBS -o result_dronelanding352.log
 
 # show module
 module avail
@@ -60,7 +60,8 @@ echo "list pip before install:"
 pip list 
 echo
 pip install -r requirements.txt
-pip install -U requests
+pip install -U requests 
+pip install -U --force-reinstall scipy==1.3.1
 echo "list pip after install:"
 pip list
 
