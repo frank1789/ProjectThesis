@@ -9,15 +9,13 @@ Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
 
-import warnings
-warnings.filterwarnings('ignore', category=FutureWarning)
 import math
 import random
 import numpy as np
 import cv2
 
-from mrcnn.config import Config
-from mrcnn import utils
+from config import Config
+import utils
 
 
 class ShapesConfig(Config):

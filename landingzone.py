@@ -88,7 +88,7 @@ class LandingZoneDataset(utils.Dataset):
         images_dir : str
             the folder path contains images related to the json file
         """
-        self.add_class("landingzone", 1, "landingzone")
+        self.add_class("landing", 1, "landing")
         if os.path.exists(annotations_dir):
             with open(annotations_dir) as infile:
                 cocojson = json.load(infile)
