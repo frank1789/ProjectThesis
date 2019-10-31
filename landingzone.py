@@ -31,11 +31,6 @@ def handler(signum, frame):
     exit(0)
 
 
-def handler(signum, frame):
-    print("Times up! Exiting...")
-    exit(0)
-
-
 # suppress warning and error message tf
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
@@ -68,7 +63,7 @@ class LandingZoneConfig(Config):
     NUM_CLASSES = 1 + 1  # background + landing mate
 
     # Number of train steps per epoch
-    STEPS_PER_EPOCH = 500
+    STEPS_PER_EPOCH = 100
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
@@ -93,6 +88,7 @@ class LandingZoneDataset(utils.Dataset):
         images_dir : str
             the folder path contains images related to the json file
         """
+        self.add_class("landingzone", 1, "landingzone")
         if os.path.exists(annotations_dir):
             with open(annotations_dir) as infile:
                 cocojson = json.load(infile)
@@ -212,7 +208,14 @@ def train(args, model) -> None:
                           learning_rate=config.LEARNING_RATE,
                           epochs=200,
                           layers='heads')
-    HistoryAnalysis.plot_history(history, "landzone")
+    HistoryAnalysis.plot_history(history, "landzone_head")
+
+    print("Train all layers")
+    hist = model.train(dataset_train, dataset_val,
+                       learning_rate=config.LEARNING_RATE,
+                       epochs=200,
+                       layers='all')
+    HistoryAnalysis.plot_history(hist, "landzone_all_layer")
 
     # # visualize
     # dataset = dataset_train
