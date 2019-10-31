@@ -36,6 +36,7 @@ module list
 ##############################################################################
 # setup environmnet
 ##############################################################################
+source $PWD/myenv/bin/activate
 echo
 echo "Updating source . . ."
 rm -rf $(find $PWD -name "ProjectThesis")
@@ -43,27 +44,6 @@ git clone -b develop https://github.com/frank1789/ProjectThesis.git
 echo "Done"
 echo
 cd ProjectThesis
-echo "Enter project folder: " $PWD
-echo "Create folder for virtual environment"
-mkdir virtualproject
-cd virtualproject
-echo "Enter virtual env folder: " $PWD
-python3 -m venv project_venv
-source project_venv/bin/activate
-cd ..
-echo "Enter project folder: " $PWD
-echo "Install requirements . . ."
-which pip
-which python3
-echo
-echo "list pip before install:"
-pip list 
-echo
-pip install -r requirements.txt
-pip install -U requests 
-pip install -U --force-reinstall scipy==1.3.1
-echo "list pip after install:"
-pip list
 
 ##############################################################################
 # Prepare dataset

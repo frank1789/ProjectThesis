@@ -11,6 +11,7 @@ import sys
 import os
 import json
 import warnings
+from staticsanalysis import HistoryAnalysis
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -24,16 +25,16 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 # check if travis environment
 is_travis = 'TRAVIS' in os.environ
 
-def handler(signum, frame):
-    print("Times up! Exiting...")
-    exit(0)
-
-import signal
-
 
 def handler(signum, frame):
     print("Times up! Exiting...")
     exit(0)
+
+
+def handler(signum, frame):
+    print("Times up! Exiting...")
+    exit(0)
+
 
 # suppress warning and error message tf
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -78,7 +79,7 @@ class LandingZoneConfig(Config):
 
     # This is how often validation is run. If you are using too much hard drive space
     # on saved models (in the MODEL_DIR), try making this value larger.
-    VALIDATION_STEPS = 5
+    VALIDATION_STEPS = 25
 
 
 class LandingZoneDataset(utils.Dataset):
@@ -207,10 +208,11 @@ def train(args, model) -> None:
     # layers. You can also pass a regular expression to select
     # which layers to train by name pattern.
     print("Training network heads")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=1,
-                layers='heads')
+    history = model.train(dataset_train, dataset_val,
+                          learning_rate=config.LEARNING_RATE,
+                          epochs=200,
+                          layers='heads')
+    HistoryAnalysis.plot_history(history, "landzone")
 
     # # visualize
     # dataset = dataset_train
@@ -273,14 +275,14 @@ if __name__ == '__main__':
                         metavar="/path/to/logs/",
                         help='Logs and checkpoints directory (default=logs/)')
     args = parser.parse_args()
-    
+
     # check existence of travis then install signal handler
     if is_travis:
         print("work on travis: ", is_travis)
         signal.signal(signal.SIGALRM, handler)
         # Set alarm for 5 minutes
         signal.alarm(300)
-    
+
     # initialize configuration
     config = LandingZoneConfig()
     config.display()
@@ -288,7 +290,7 @@ if __name__ == '__main__':
     model = modellib.MaskRCNN(
         mode="training", config=config, model_dir=MODEL_DIR)
     model = init_weights(args, model)
-    
+
     ##############################################################################
     #    Training                                                                #
     ##############################################################################

@@ -36,22 +36,22 @@ def save_response_content(response, destination):
     # file_size = int(response.headers.get('content-length'))
     num_bars = int(file_size / CHUNK_SIZE)
     pbar = tqdm(
-                response.iter_content(chunk_size=CHUNK_SIZE)
-                , total=num_bars
-                , unit='KB'
-                , desc=destination
-        )
+        response.iter_content(chunk_size=CHUNK_SIZE), total=num_bars, unit='KB', desc=destination
+    )
     with open(destination, "wb") as f:
         for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
             f.write(chunk)
             pbar.update(len(chunk))
     pbar.close()
     print("\n")
-    
 
 
 if __name__ == "__main__":
     file_id = "16ZGOwfLrN_54eR5yhXFtp8tmJ10Abudr"
     destination = os.path.join(os.getcwd(), "dataset.zip")
-    print("Download file:")
-    download_file_from_google_drive(file_id, destination)
+    if not os.path.exists(destination):
+        print("Download file:")
+        download_file_from_google_drive(file_id, destination)
+    else:
+        print("File exist")
+        exit(0)
