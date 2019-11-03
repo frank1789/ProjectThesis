@@ -204,18 +204,23 @@ def train(args, model) -> None:
     # layers. You can also pass a regular expression to select
     # which layers to train by name pattern.
     print("Training network heads")
-    history = model.train(dataset_train, dataset_val,
+    model.train(dataset_train, dataset_val,
                           learning_rate=config.LEARNING_RATE,
-                          epochs=200,
+                          epochs=500,
                           layers='heads')
-    HistoryAnalysis.plot_history(history, "landzone_head")
+
+    HistoryAnalysis.plot_history(model.keras_model.history.history, "landzone_head")
 
     print("Train all layers")
-    hist = model.train(dataset_train, dataset_val,
-                       learning_rate=config.LEARNING_RATE,
-                       epochs=200,
+    model.train(dataset_train, dataset_val,
+                       learning_rate=config.LEARNING_RATE / 10,
+                       epochs=500,
                        layers='all')
-    HistoryAnalysis.plot_history(hist, "landzone_all_layer")
+    HistoryAnalysis.plot_history(model.keras_model.history.history, "landzone_all_layer")
+
+    filename = os.path.join("./model_mask", "resnet_101_maskrcnn_lz.h5")
+    model.save(filename)
+    print('Saved model at: ', filename)
 
     # # visualize
     # dataset = dataset_train
