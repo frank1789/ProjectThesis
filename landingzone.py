@@ -4,14 +4,7 @@
 import json
 import os
 import signal
-from mrcnn.config import Config
-from mrcnn import utils
-from mrcnn import model as modellib
-from PIL import Image, ImageDraw
-import numpy as np
 import sys
-import os
-import json
 import warnings
 
 import numpy as np
@@ -23,7 +16,6 @@ from mrcnn.config import Config
 from staticsanalysis import HistoryAnalysis
 
 warnings.filterwarnings('ignore', category=FutureWarning)
-
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
