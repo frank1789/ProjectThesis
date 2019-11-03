@@ -163,7 +163,7 @@ class LandingZoneDataset(utils.Dataset):
         instance_masks = []
         class_ids = []
 
-        for annotation in annotations[:1]:
+        for annotation in annotations:
             class_id = annotation['category_id']
             mask = Image.new('1', (image_info['width'], image_info['height']))
             mask_draw = ImageDraw.ImageDraw(mask, '1')
