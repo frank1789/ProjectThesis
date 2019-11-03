@@ -63,9 +63,6 @@ class LandingZoneConfig(Config):
     # Number of class
     NUM_CLASSES = 1 + 1  # background + landing mate
 
-    # Number of train steps per epoch
-    STEPS_PER_EPOCH = 100
-
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
@@ -75,7 +72,7 @@ class LandingZoneConfig(Config):
 
     # This is how often validation is run. If you are using too much hard drive space
     # on saved models (in the MODEL_DIR), try making this value larger.
-    VALIDATION_STEPS = 25
+    VALIDATION_STEPS = 50
 
 
 class LandingZoneDataset(utils.Dataset):
@@ -166,7 +163,7 @@ class LandingZoneDataset(utils.Dataset):
         instance_masks = []
         class_ids = []
 
-        for annotation in annotations:
+        for annotation in annotations[:1]:
             class_id = annotation['category_id']
             mask = Image.new('1', (image_info['width'], image_info['height']))
             mask_draw = ImageDraw.ImageDraw(mask, '1')
