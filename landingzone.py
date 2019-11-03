@@ -185,8 +185,13 @@ class LandingZoneDataset(utils.Dataset):
 def train(args, model) -> None:
     """
     Train the model
+
+    Parameters
+    ----------
+    :param args:
+        (object) Inputs the parameters passed to the command-line script as input.
     :param model:
-    :return:
+        (object) model of the neural network
     """
     # training dataset
     path = args.annotations
@@ -233,7 +238,22 @@ def train(args, model) -> None:
     #         image, mask, class_ids, dataset.class_names)
 
 
-def init_weights(args, model):
+def init_weights(args, model) -> object:
+    """
+    Initializes the neural network weights from known networks such as COCO, imagenet or from the last training.
+
+    Parameters
+    ----------
+    :param args:
+        (object) Inputs the parameters passed to the command-line script as input --> weights
+    :param model:
+        (object) model of the neural network.
+
+    Returns
+    -------
+    :return model:
+        (object) returns the model with the weights to be trained.
+    """
     # weights_path = None
     # Select weights file to load
     if args.weights.lower() == "coco":
