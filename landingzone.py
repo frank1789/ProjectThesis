@@ -1,6 +1,8 @@
 #!usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
+import os
 import signal
 from mrcnn.config import Config
 from mrcnn import utils
@@ -11,6 +13,13 @@ import sys
 import os
 import json
 import warnings
+
+import numpy as np
+from PIL import Image, ImageDraw
+
+from mrcnn import model as modellib
+from mrcnn import utils
+from mrcnn.config import Config
 from staticsanalysis import HistoryAnalysis
 
 warnings.filterwarnings('ignore', category=FutureWarning)
@@ -205,17 +214,17 @@ def train(args, model) -> None:
     # which layers to train by name pattern.
     print("Training network heads")
     model.train(dataset_train, dataset_val,
-                          learning_rate=config.LEARNING_RATE,
-                          epochs=500,
-                          layers='heads')
+                learning_rate=config.LEARNING_RATE,
+                epochs=500,
+                layers='heads')
 
     HistoryAnalysis.plot_history(model.keras_model.history.history, "landzone_head")
 
     print("Train all layers")
     model.train(dataset_train, dataset_val,
-                       learning_rate=config.LEARNING_RATE / 10,
-                       epochs=500,
-                       layers='all')
+                learning_rate=config.LEARNING_RATE / 10,
+                epochs=500,
+                layers='all')
     HistoryAnalysis.plot_history(model.keras_model.history.history, "landzone_all_layer")
 
     filename = os.path.join("./model_mask", "resnet_101_maskrcnn_lz.h5")
