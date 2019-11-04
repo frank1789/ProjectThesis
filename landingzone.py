@@ -13,12 +13,11 @@ from PIL import Image, ImageDraw
 from mrcnn import model as modellib
 from mrcnn import utils
 from mrcnn.config import Config
-from staticsanalysis import HistoryAnalysis
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 # Root directory of the project
-ROOT_DIR = os.path.abspath("../../")
+ROOT_DIR = os.getcwd()
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -58,10 +57,10 @@ class LandingZoneConfig(Config):
     NAME = "landing"
 
     # Adjust for GPU
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 32
 
     # Number of class
-    NUM_CLASSES = 1 + 1  # background + landing mate
+    NUM_CLASSES = 1 + 3  # background + landing mate
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
@@ -86,7 +85,6 @@ class LandingZoneDataset(utils.Dataset):
         images_dir : str
             the folder path contains images related to the json file
         """
-        self.add_class("landing", 1, "landing")
         if os.path.exists(annotations_dir):
             with open(annotations_dir) as infile:
                 cocojson = json.load(infile)
@@ -178,6 +176,14 @@ class LandingZoneDataset(utils.Dataset):
 
         return mask, class_ids
 
+    def image_reference(self, image_id):
+        """Return the path of the image."""
+        info = self.image_info[image_id]
+        if info["source"] == "landing zone":
+            return info["path"]
+        else:
+            super(self.__class__, self).image_reference(image_id)
+
 
 def train(args, model) -> None:
     """
@@ -209,21 +215,14 @@ def train(args, model) -> None:
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=500,
+                epochs=50,
                 layers='heads')
-
-    HistoryAnalysis.plot_history(model.keras_model.history.history, "landzone_head")
 
     print("Train all layers")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE / 10,
-                epochs=500,
+                epochs=50,
                 layers='all')
-    HistoryAnalysis.plot_history(model.keras_model.history.history, "landzone_all_layer")
-
-    filename = os.path.join("./model_mask", "resnet_101_maskrcnn_lz.h5")
-    model.save(filename)
-    print('Saved model at: ', filename)
 
     # # visualize
     # dataset = dataset_train
