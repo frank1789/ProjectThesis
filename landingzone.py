@@ -57,7 +57,10 @@ class LandingZoneConfig(Config):
     NAME = "landing"
 
     # Adjust for GPU
-    IMAGES_PER_GPU = 8
+    if is_travis:
+        IMAGES_PER_GPU = 2
+    else:
+        IMAGES_PER_GPU = 8
 
     # Number of class
     NUM_CLASSES = 1 + 3  # background + landing mate
