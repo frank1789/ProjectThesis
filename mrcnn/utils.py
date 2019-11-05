@@ -7,21 +7,19 @@ Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
 
-import sys
-import os
 import logging
-import math
 import random
+import shutil
+import urllib.request
+import warnings
+from distutils.version import LooseVersion
+
 import numpy as np
-import tensorflow as tf
 import scipy
 import skimage.color
 import skimage.io
 import skimage.transform
-import urllib.request
-import shutil
-import warnings
-from distutils.version import LooseVersion
+import tensorflow as tf
 
 # URL from which to download the latest COCO trained weights
 COCO_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5"
@@ -208,28 +206,28 @@ def box_refinement_graph(box, gt_box):
 
 def box_refinement(box, gt_box):
     """Compute refinement needed to transform box to gt_box.
-    box and gt_box are [N, (y1, x1, y2, x2)]. (y2, x2) is
+    box and gt_box are [..., (y1, x1, y2, x2)]. (y2, x2) is
     assumed to be outside the box.
     """
     box = box.astype(np.float32)
     gt_box = gt_box.astype(np.float32)
 
-    height = box[:, 2] - box[:, 0]
-    width = box[:, 3] - box[:, 1]
-    center_y = box[:, 0] + 0.5 * height
-    center_x = box[:, 1] + 0.5 * width
+    height = box[..., 2] - box[..., 0]
+    width = box[..., 3] - box[..., 1]
+    center_y = box[..., 0] + 0.5 * height
+    center_x = box[..., 1] + 0.5 * width
 
-    gt_height = gt_box[:, 2] - gt_box[:, 0]
-    gt_width = gt_box[:, 3] - gt_box[:, 1]
-    gt_center_y = gt_box[:, 0] + 0.5 * gt_height
-    gt_center_x = gt_box[:, 1] + 0.5 * gt_width
+    gt_height = gt_box[..., 2] - gt_box[..., 0]
+    gt_width = gt_box[..., 3] - gt_box[..., 1]
+    gt_center_y = gt_box[..., 0] + 0.5 * gt_height
+    gt_center_x = gt_box[..., 1] + 0.5 * gt_width
 
     dy = (gt_center_y - center_y) / height
     dx = (gt_center_x - center_x) / width
     dh = np.log(gt_height / height)
     dw = np.log(gt_width / width)
 
-    return np.stack([dy, dx, dh, dw], axis=1)
+    return np.stack([dy, dx, dh, dw], axis=-1)
 
 
 ############################################################
