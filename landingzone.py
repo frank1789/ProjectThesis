@@ -7,6 +7,7 @@ import signal
 import sys
 import warnings
 
+import  keras.backend as K
 import numpy as np
 from PIL import Image, ImageDraw
 import imgaug as ia
@@ -79,6 +80,10 @@ class LandingZoneConfig(Config):
     # This is how often validation is run. If you are using too much hard drive space
     # on saved models (in the MODEL_DIR), try making this value larger.
     VALIDATION_STEPS = 50
+
+    # NUMBER OF GPUs to use. When using only a CPU, this needs to be set to 1.
+    if len(K.tensorflow_backend._get_available_gpus()) > 0:
+        GPU_COUNT = len(K.tensorflow_backend._get_available_gpus())
 
 
 ##############################################################################
