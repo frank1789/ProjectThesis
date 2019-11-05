@@ -9,11 +9,11 @@ import warnings
 
 import numpy as np
 from PIL import Image, ImageDraw
+from imgaug import augmenters as iaa
 
 from mrcnn import model as modellib
 from mrcnn import utils
 from mrcnn.config import Config
-from imgaug import augmenters as iaa
 from statisticanalysis import HistoryAnalysis
 
 warnings.filterwarnings('ignore', category=FutureWarning)
@@ -78,8 +78,6 @@ class LandingZoneConfig(Config):
     # This is how often validation is run. If you are using too much hard drive space
     # on saved models (in the MODEL_DIR), try making this value larger.
     VALIDATION_STEPS = 50
-
-    STEPS_PER_EPOCH = 1
 
 
 ##############################################################################
@@ -260,7 +258,7 @@ def train(args, model) -> None:
                 shear=(-16, 16),
                 order=[0, 1],
                 cval=(0, 255),
-                mode=ia.ALL
+                mode=iaa.ALL
             )),
 
             #
@@ -373,14 +371,14 @@ def train(args, model) -> None:
     print("Training network heads")
     hist1 = model.train(dataset_train, dataset_val,
                         learning_rate=config.LEARNING_RATE,
-                        epochs=1,
+                        epochs=100,
                         layers='heads',
                         augmentation=seq)
 
     print("Train all layers")
     hist2 = model.train(dataset_train, dataset_val,
                         learning_rate=config.LEARNING_RATE / 10,
-                        epochs=1,
+                        epochs=200,
                         layers='all',
                         augmentation=seq)
 
