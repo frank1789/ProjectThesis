@@ -73,7 +73,7 @@ python3 setup.py install
 # environment variable
 export HDF5_USE_FILE_LOCKING=FALSE
 # launch script python
-python3 landingzone.py -a ${datasetannotations} -d ${datasetpath} --weights=coco
+python3 landingzone.py train -a ${datasetannotations} -d ${datasetpath} --weights=coco
 
 ##############################################################################
 # deactivate virtual env
