@@ -7,10 +7,10 @@ import signal
 import sys
 import warnings
 
-import  keras.backend as K
+import imgaug as ia
+import keras.backend as K
 import numpy as np
 from PIL import Image, ImageDraw
-import imgaug as ia
 from imgaug import augmenters as iaa
 
 from mrcnn import model as modellib
@@ -453,6 +453,7 @@ if __name__ == '__main__':
     # Parse command line arguments
     parser = argparse.ArgumentParser(
         description='Train Mask R-CNN to detect landing zone mate.')
+    parser.add_argument("command", metavar="<command>", help="'train or detect'")
     parser.add_argument('-a', '--annotations', required=True,
                         metavar="/path/to/dataset/annotations.json",
                         help='Path to annotations json file')
@@ -475,13 +476,25 @@ if __name__ == '__main__':
         # Set alarm for 5 minutes
         signal.alarm(300)
 
-    # initialize configuration
-    config = LandingZoneConfig()
-    config.display()
-    # create model in training mode
-    model = modellib.MaskRCNN(
-        mode="training", config=config, model_dir=MODEL_DIR)
-    model = init_weights(args, model)
+    if args.command == "train":
+        # initialize configuration
+        config = LandingZoneConfig()
+        config.display()
+        # create model in training mode
+        model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
+        model = init_weights(args, model)
+    elif args.command == "detect":
+        # initialize configuration
+        config = LandingZoneConfig()
+        config.display()
+        # create model in training mode
+        model = modellib.MaskRCNN(mode="inference", config=config, model_dir=MODEL_DIR)
+        model = init_weights(args, model)
+    else:
+        raise ValueError("The first argument must specify: training ('train) or inference ('detect')."
+                         "\nExample:\n"
+                         "python3 landingzone.py train  -a /path/to/dataset/annotations.json -d/path/to/dataset/ --weights=coco"
+                         "python3 landingzone.py detect -a /path/to/dataset/annotations.json -d /path/to/dataset/ --weights=last")
 
     ##############################################################################
     #    Training                                                                #
