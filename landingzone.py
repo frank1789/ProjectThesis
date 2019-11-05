@@ -9,6 +9,7 @@ import warnings
 
 import numpy as np
 from PIL import Image, ImageDraw
+import imgaug as ia
 from imgaug import augmenters as iaa
 
 from mrcnn import model as modellib
@@ -258,7 +259,7 @@ def train(args, model) -> None:
                 shear=(-16, 16),
                 order=[0, 1],
                 cval=(0, 255),
-                mode=iaa.ALL
+                mode=ia.ALL
             )),
 
             #
