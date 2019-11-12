@@ -16,7 +16,7 @@ from imgaug import augmenters as iaa
 from mrcnn import model as modellib
 from mrcnn import utils
 from mrcnn.config import Config
-from statisticanalysis import HistoryAnalysis
+from statisticanalysis import MaskRCNNAnalysis
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -375,21 +375,22 @@ def train(args, model) -> None:
     # layers. You can also pass a regular expression to select
     # which layers to train by name pattern.
     print("Training network heads")
-    hist1 = model.train(dataset_train, dataset_val,
-                        learning_rate=config.LEARNING_RATE,
-                        epochs=100,
-                        layers='heads',
-                        augmentation=seq)
+    hist_head = model.train(dataset_train, dataset_val,
+                            learning_rate=config.LEARNING_RATE,
+                            epochs=100,
+                            layers='heads',
+                            augmentation=seq)
+    plot_head = MaskRCNNAnalysis()
+    plot_head.generate_plot(100, hist_head)
 
     print("Train all layers")
-    hist2 = model.train(dataset_train, dataset_val,
-                        learning_rate=config.LEARNING_RATE / 10,
-                        epochs=200,
-                        layers='all',
-                        augmentation=seq)
-
-    HistoryAnalysis.plot_history(hist1, "head_lz")
-    HistoryAnalysis.plot_history(hist2, "all_lz")
+    hist_all = model.train(dataset_train, dataset_val,
+                           learning_rate=config.LEARNING_RATE / 10,
+                           epochs=200,
+                           layers='all',
+                           augmentation=seq)
+    plot_all = MaskRCNNAnalysis()
+    plot_all.generate_plot(200, hist_all)
 
     # # visualize
     # dataset = dataset_train
@@ -474,7 +475,7 @@ if __name__ == '__main__':
         print("work on travis: ", is_travis)
         signal.signal(signal.SIGALRM, handler)
         # Set alarm for 5 minutes
-        signal.alarm(300)
+        signal.alarm(200)
 
     if args.command == "train":
         # initialize configuration

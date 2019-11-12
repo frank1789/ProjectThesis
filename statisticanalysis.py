@@ -1,13 +1,66 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+from abc import ABC, abstractmethod
+
 import matplotlib
 
 # This needs to be done *before* importing pyplot or pylab
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import os
+
+
+class BaseHistoryAnalysis(ABC):
+    def __init__(self):
+        super(BaseHistoryAnalysis, self).__init__()
+
+    @abstractmethod
+    def generate_plot(self, epochs, history):
+        pass
+
+    @abstractmethod
+    def prepare_folder(self):
+        pass
+
+
+class MaskRCNNAnalysis(BaseHistoryAnalysis):
+    def __init__(self):
+        super().__init__()
+
+    def generate_plot(self, epochs, history):
+        save_directory = self.prepare_folder()
+        generate_name = (lambda name: "{:s}_loss.png".format(name))
+
+        # export train-valid loss
+        train_valid = class_valid = os.path.join(save_directory, generate_name("train_valid"))
+        plt.plot(epochs, history["loss"], label="Train loss")
+        plt.plot(epochs, history["val_loss"], label="Valid loss")
+        plt.legend()
+        plt.savefig(train_valid)
+
+        # export train-valid class
+        class_valid = os.path.join(save_directory, generate_name("train_valid_class"))
+        plt.plot(epochs, history["mrcnn_class_loss"], label="Train class ce")
+        plt.plot(epochs, history["val_mrcnn_class_loss"], label="Valid class ce")
+        plt.legend()
+        plt.savefig(class_valid)
+
+        # export  train-valid box
+        box_valid = os.path.join(save_directory, generate_name("train_valid_box"))
+        plt.plot(epochs, history["mrcnn_bbox_loss"], label="Train box loss")
+        plt.plot(epochs, history["val_mrcnn_bbox_loss"], label="Valid box loss")
+        plt.legend()
+        plt.savefig(box_valid)
+
+    def prepare_folder(self):
+        plot_folder = "result_plot"
+        if not os.path.exists(plot_folder):
+            os.makedirs(plot_folder)
+        return plot_folder
 
 
 class HistoryAnalysis:
-
     @staticmethod
     def plot_history(history, namefile):
         """
