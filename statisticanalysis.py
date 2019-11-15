@@ -43,24 +43,24 @@ class MaskRCNNAnalysis(BaseHistoryAnalysis):
 
         # export train-valid loss
         train_valid = os.path.join(save_directory, generate_name("train_valid"))
-        plt.plot(epochs, history["loss"], label="Train loss")
-        plt.plot(epochs, history["val_loss"], label="Valid loss")
+        plt.plot(range(epochs), history["loss"], label="Train loss")
+        plt.plot(range(epochs), history["val_loss"], label="Valid loss")
         plt.legend()
         plt.savefig(train_valid)
         plt.close()
 
         # export train-valid class
         class_valid = os.path.join(save_directory, generate_name("train_valid_class"))
-        plt.plot(epochs, history["mrcnn_class_loss"], label="Train class ce")
-        plt.plot(epochs, history["val_mrcnn_class_loss"], label="Valid class ce")
+        plt.plot(range(epochs), history["mrcnn_class_loss"], label="Train class ce")
+        plt.plot(range(epochs), history["val_mrcnn_class_loss"], label="Valid class ce")
         plt.legend()
         plt.savefig(class_valid)
         plt.close()
 
         # export  train-valid box
         box_valid = os.path.join(save_directory, generate_name("train_valid_box"))
-        plt.plot(epochs, history["mrcnn_bbox_loss"], label="Train box loss")
-        plt.plot(epochs, history["val_mrcnn_bbox_loss"], label="Valid box loss")
+        plt.plot(range(epochs), history["mrcnn_bbox_loss"], label="Train box loss")
+        plt.plot(range(epochs), history["val_mrcnn_bbox_loss"], label="Valid box loss")
         plt.legend()
         plt.savefig(box_valid)
         plt.close()
