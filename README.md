@@ -22,9 +22,10 @@ To improve the meshing of the net it was decided to use replicas using a simple 
 The camera reproduces the features of the Raspberry Pi Camera V2 as mentioned before.
 
 Render samples:
-![sample1](https://github.com/frank1789/ProjectThesis/sample/sample1.png)
-![sample2](https://github.com/frank1789/ProjectThesis/sample/sample2.png)
-![sample3](https://github.com/frank1789/ProjectThesis/sample/sample3.png)
+
+![sample1](sample/sample1.jpg)
+![sample2](sample/sample2.jpg)
+![sample3](sample/sample3.jpg)
 
 
 # Requirements
