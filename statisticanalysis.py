@@ -16,11 +16,11 @@ class BaseHistoryAnalysis(ABC):
         super(BaseHistoryAnalysis, self).__init__()
 
     @abstractmethod
-    def generate_plot(self, epochs, history):
+    def generate_plot(self, epochs, history, namedir) -> None:
         pass
 
     @abstractmethod
-    def prepare_folder(self):
+    def prepare_folder(self, namedir) -> str:
         pass
 
 
@@ -28,16 +28,26 @@ class MaskRCNNAnalysis(BaseHistoryAnalysis):
     def __init__(self):
         super().__init__()
 
-    def generate_plot(self, epochs, history):
-        save_directory = self.prepare_folder()
+    def generate_plot(self, epochs, history, namedir) -> None:
+        """
+        function that extracts the information of the training history from the keras model to the specific Mask - R CNN.
+
+        Parameters
+        ----------
+        :param epochs: (int) number of epochs.
+        :param history: (object) history from keras model.
+        :param namedir: (str) name of directory where save plot.
+        """
+        save_directory = self.prepare_folder(namedir)
         generate_name = (lambda name: "{:s}_loss.png".format(name))
 
         # export train-valid loss
-        train_valid = class_valid = os.path.join(save_directory, generate_name("train_valid"))
+        train_valid = os.path.join(save_directory, generate_name("train_valid"))
         plt.plot(epochs, history["loss"], label="Train loss")
         plt.plot(epochs, history["val_loss"], label="Valid loss")
         plt.legend()
         plt.savefig(train_valid)
+        plt.close()
 
         # export train-valid class
         class_valid = os.path.join(save_directory, generate_name("train_valid_class"))
@@ -45,6 +55,7 @@ class MaskRCNNAnalysis(BaseHistoryAnalysis):
         plt.plot(epochs, history["val_mrcnn_class_loss"], label="Valid class ce")
         plt.legend()
         plt.savefig(class_valid)
+        plt.close()
 
         # export  train-valid box
         box_valid = os.path.join(save_directory, generate_name("train_valid_box"))
@@ -52,9 +63,22 @@ class MaskRCNNAnalysis(BaseHistoryAnalysis):
         plt.plot(epochs, history["val_mrcnn_bbox_loss"], label="Valid box loss")
         plt.legend()
         plt.savefig(box_valid)
+        plt.close()
 
-    def prepare_folder(self):
-        plot_folder = "result_plot"
+    def prepare_folder(self, namedir) -> str:
+        """
+        function that checks if the destination folder exists to save the plots. If it does not exist, it constructs it
+        and returns the path as a string.
+
+        Parameters
+        ----------
+        :param namedir: (str) folder's name.
+
+        Return
+        ------
+        :return: (str) path.
+        """
+        plot_folder = os.path.join("result_plot", namedir)
         if not os.path.exists(plot_folder):
             os.makedirs(plot_folder)
         return plot_folder
@@ -67,8 +91,14 @@ class HistoryAnalysis:
         Collects the history, returned from training the model and creates two charts:
         A plot of accuracy on the training and validation datasets over training epochs.
         A plot of loss on the training and validation datasets over training epochs.
+
+        Parameters
+        ----------
         :param history: (dict) from keras fit
         :param namefile: (str) set name save file
+
+        Return
+        ------
         :return: plt(object) plot
         """
         # make new directory

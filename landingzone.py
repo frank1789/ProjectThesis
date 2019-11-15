@@ -366,10 +366,10 @@ def train(args, model) -> None:
 
                            # In some images distort local areas with varying strength.
                            sometimes(iaa.PiecewiseAffine(scale=(0.01, 0.05)))
-            ],
-                # do all of the above augmentations in random order
-                random_order=True
-            )
+                       ],
+                       # do all of the above augmentations in random order
+                       random_order=True
+                       )
         ],
         # do all of the above augmentations in random order
         random_order=True
@@ -386,7 +386,7 @@ def train(args, model) -> None:
                             layers='heads',
                             augmentation=seq)
     plot_head = MaskRCNNAnalysis()
-    plot_head.generate_plot(100, hist_head)
+    plot_head.generate_plot(100, hist_head.history, "history_head")
 
     print("Train all layers")
     hist_all = model.train(dataset_train, dataset_val,
@@ -395,7 +395,7 @@ def train(args, model) -> None:
                            layers='all',
                            augmentation=seq)
     plot_all = MaskRCNNAnalysis()
-    plot_all.generate_plot(200, hist_all)
+    plot_all.generate_plot(200, hist_all.history, "history_all")
 
     # # visualize
     # dataset = dataset_train
@@ -517,3 +517,4 @@ if __name__ == '__main__':
     # 2. Fine-tune all layers. For this simple example it's not necessary, but we're
     #  including it to show the process. Simply pass layers="all to train all layers.
     train(args, model)
+    sys.exit()
