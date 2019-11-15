@@ -16,7 +16,7 @@ from imgaug import augmenters as iaa
 from mrcnn import model as modellib
 from mrcnn import utils
 from mrcnn.config import Config
-from statisticanalysis import HistoryAnalysis
+from statisticanalysis import MaskRCNNAnalysis
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -65,7 +65,7 @@ class LandingZoneConfig(Config):
     NAME = "landing"
 
     # Adjust for GPU
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 3
 
     # Number of class
     NUM_CLASSES = 1 + 3  # background + landing mate
@@ -193,12 +193,14 @@ class LandingZoneDataset(utils.Dataset):
         return mask, class_ids
 
     def image_reference(self, image_id):
-        """Return the path of the image."""
+        """
+        Return the path of the image.
+        """
         info = self.image_info[image_id]
         if info["source"] == "landing zone":
             return info["path"]
         else:
-            super(self.__class__, self).image_reference(image_id)
+            super().image_reference(image_id)
 
 
 ##############################################################################
@@ -232,7 +234,7 @@ def train(args, model) -> None:
     # Sometimes(0.5, ...) applies the given augmenter in 50% of all cases,
     # e.g. Sometimes(0.5, GaussianBlur(0.3)) would blur roughly every second
     # image.
-    sometimes = lambda aug: iaa.Sometimes(0.5, aug)
+    def sometimes(aug): return iaa.Sometimes(0.5, aug)
 
     # Define our sequence of augmentation steps that will be applied to every image.
     seq = iaa.Sequential(
@@ -337,7 +339,8 @@ def train(args, model) -> None:
 
                            # Invert each image's channel with 5% probability.
                            # This sets each pixel value v to 255-v.
-                           iaa.Invert(0.05, per_channel=True),  # invert color channels
+                           # invert color channels
+                           iaa.Invert(0.05, per_channel=True),
 
                            # Add a value of -10 to 10 to each pixel.
                            iaa.Add((-10, 10), per_channel=0.5),
@@ -346,7 +349,8 @@ def train(args, model) -> None:
                            iaa.Multiply((0.5, 1.5), per_channel=0.5),
 
                            # Improve or worsen the contrast of images.
-                           iaa.ContrastNormalization((0.5, 2.0), per_channel=0.5),
+                           iaa.ContrastNormalization(
+                               (0.5, 2.0), per_channel=0.5),
 
                            # Convert each image to grayscale and then overlay the
                            # result with the original with random alpha. I.e. remove
@@ -356,7 +360,8 @@ def train(args, model) -> None:
                            # In some images move pixels locally around (with random
                            # strengths).
                            sometimes(
-                               iaa.ElasticTransformation(alpha=(0.5, 3.5), sigma=0.25)
+                               iaa.ElasticTransformation(
+                                   alpha=(0.5, 3.5), sigma=0.25)
                            ),
 
                            # In some images distort local areas with varying strength.
@@ -375,21 +380,22 @@ def train(args, model) -> None:
     # layers. You can also pass a regular expression to select
     # which layers to train by name pattern.
     print("Training network heads")
-    hist1 = model.train(dataset_train, dataset_val,
-                        learning_rate=config.LEARNING_RATE,
-                        epochs=100,
-                        layers='heads',
-                        augmentation=seq)
+    hist_head = model.train(dataset_train, dataset_val,
+                            learning_rate=config.LEARNING_RATE,
+                            epochs=100,
+                            layers='heads',
+                            augmentation=seq)
+    plot_head = MaskRCNNAnalysis()
+    plot_head.generate_plot(100, hist_head.history, "history_head")
 
     print("Train all layers")
-    hist2 = model.train(dataset_train, dataset_val,
-                        learning_rate=config.LEARNING_RATE / 10,
-                        epochs=200,
-                        layers='all',
-                        augmentation=seq)
-
-    HistoryAnalysis.plot_history(hist1, "head_lz")
-    HistoryAnalysis.plot_history(hist2, "all_lz")
+    hist_all = model.train(dataset_train, dataset_val,
+                           learning_rate=config.LEARNING_RATE / 10,
+                           epochs=200,
+                           layers='all',
+                           augmentation=seq)
+    plot_all = MaskRCNNAnalysis()
+    plot_all.generate_plot(200, hist_all.history, "history_all")
 
     # # visualize
     # dataset = dataset_train
@@ -453,7 +459,8 @@ if __name__ == '__main__':
     # Parse command line arguments
     parser = argparse.ArgumentParser(
         description='Train Mask R-CNN to detect landing zone mate.')
-    parser.add_argument("command", metavar="<command>", help="'train or detect'")
+    parser.add_argument("command", metavar="<command>",
+                        help="'train or detect'")
     parser.add_argument('-a', '--annotations', required=True,
                         metavar="/path/to/dataset/annotations.json",
                         help='Path to annotations json file')
@@ -474,21 +481,23 @@ if __name__ == '__main__':
         print("work on travis: ", is_travis)
         signal.signal(signal.SIGALRM, handler)
         # Set alarm for 5 minutes
-        signal.alarm(300)
+        signal.alarm(200)
 
     if args.command == "train":
         # initialize configuration
         config = LandingZoneConfig()
         config.display()
         # create model in training mode
-        model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
+        model = modellib.MaskRCNN(
+            mode="training", config=config, model_dir=MODEL_DIR)
         model = init_weights(args, model)
     elif args.command == "detect":
         # initialize configuration
         config = LandingZoneConfig()
         config.display()
         # create model in training mode
-        model = modellib.MaskRCNN(mode="inference", config=config, model_dir=MODEL_DIR)
+        model = modellib.MaskRCNN(
+            mode="inference", config=config, model_dir=MODEL_DIR)
         model = init_weights(args, model)
     else:
         raise ValueError("The first argument must specify: training ('train) or inference ('detect')."
@@ -508,3 +517,4 @@ if __name__ == '__main__':
     # 2. Fine-tune all layers. For this simple example it's not necessary, but we're
     #  including it to show the process. Simply pass layers="all to train all layers.
     train(args, model)
+    sys.exit()
