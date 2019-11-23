@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 
 import requests
 from tqdm import tqdm
@@ -52,6 +53,7 @@ if __name__ == "__main__":
     if not os.path.exists(destination):
         print("Download file:")
         download_file_from_google_drive(file_id, destination)
+        sys.exit()
     else:
         print("File exist")
-        exit(0)
+        sys.exit()
