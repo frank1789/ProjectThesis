@@ -1,4 +1,15 @@
 
+
+
+DIR_DATASET := $(find ${PROJECT_DIR} -name "landingzone")
+
+
+
+
+
+
+
+
 # Directives of the interpreter, path to the python file
 # command to carry out the conversion
 DEVPATH := /opt/intel/openvino_2019.3.334/deployment_tools/model_optimizer
@@ -34,6 +45,35 @@ summarize:
 
 export:
 	${INTERPRETER} convert_keras_tf.py
+
+.PHONY: prepare
+prepare:
+	@echo
+	@echo "==> Dowload dataset"
+	@echo
+	# Download dataset
+	coverage run downloadmanager.py
+	@echo
+	@echo "==> unizp dataset zip file"
+	@echo
+    # clean from from garbage files
+	unzip -qq dataset.zip
+	find . -type f -name '._*' -delete
+	delfolder=$(find . -type d -name '__MACOSX')
+	rm -rf ${delfolder}
+	rm -rf dataset.zip
+	datasetannotations=$(find $PWD -name "annotations.json")
+	@echo "found dataset annotaions at ${datasetannotations}"
+
+
+.PHONY: test
+test: prepare
+	# export csv
+	coverage run -a xml_to_csv.py --annotations ${DIR_DATASET}/train -output_csv train_labels.csv
+	coverage run -a xml_to_csv.py --annotations ${DIR_DATASET}/validate -output_csv validate_labels.csv
+	@echo
+	coverage run -a ${landing_script} train --annotations ${datasetannotations} --dataset ${DIR_DATASET} --weights=coco
+  	coverage run -a ${landing_script} train --annotations ${datasetannotations} --dataset ${DIR_DATASET} --weights=imagenet
 
 help:
 	${CC} --help
