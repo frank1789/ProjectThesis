@@ -19,8 +19,9 @@ python3 $TF_API_DIR/object_detection/builders/model_builder_test.py
 ##############################################################################
 # Prepare dataset
 ##############################################################################
-DIRECTORY_DATASET=landingzone
-if [ ! -d "$DIRECTORY_DATASET" ]; then
+DIR_DATASET=$(find ${PROJECT_DIR} -name "landingzone")
+echo
+if [ ! -d "$DIR_DATASET" ]; then
     echo
     echo "==> Dowload dataset"
     echo
@@ -41,12 +42,23 @@ if [ ! -d "$DIRECTORY_DATASET" ]; then
     rm -rf dataset.zip
 fi
 
-python3 xml_to_csv.py -a $PWD/$DIRECTORY_DATASET
+# export csv
+python3 xml_to_csv.py -a $DIR_DATASET/train -o train_labels.csv
+python3 xml_to_csv.py -a $DIR_DATASET/validate -o validate_labels.csv
+echo
 
-csv_dataset=$(find . -type d -name '*.csv')
-python3 generate_tfrecord.py --csv_input=${csv_dataset} \
+# create records
+csv_train=$(find . -name 'train_labels.csv')
+csv_val=$(find . -name 'validate_labels.csv')
+DIR_TRAIN=$(find $DIR_DATASET -name "train")
+DIR_VALIDATE=$(find $DIR_DATASET -name "validate")
+python3 generate_tfrecord.py --csv_input=${csv_train} \
     --output_path=data/train.record \
-    --image_dir=${DIRECTORY_DATASET}
+    --img_path=${DIR_TRAIN}
+python3 generate_tfrecord.py --csv_input=${csv_val} \
+    --output_path=data/validate.record \
+    --img_path=${DIR_VALIDATE}
+echo
 
 ##############################################################################
 # Download pre-trained model
@@ -54,7 +66,7 @@ python3 generate_tfrecord.py --csv_input=${csv_dataset} \
 
 cd $PROJECT_DIR/models
 curl -L http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.tar.gz -o ssd_mobilenet_v2_quantized.tar.gz
-tar -xvf ssd_mobilenet_v2_quantized.tar.gz
+tar -xvf -k --exclude='pipeline.config' ssd_mobilenet_v2_quantized.tar.gz
 rm ssd_mobilenet_v2_quantized.tar.gz
 cd ..
 
