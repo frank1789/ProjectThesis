@@ -35,8 +35,13 @@ before_script:
   -  python3 setup.py install
 
 script:
-  - coverage run ${landing_script} train --annotations ${datasetannotations} --dataset ${datasetpath} --weights=coco
+  - coverage run downloadmanager.py
+  - coverage run -a preparedata.py --dataset ${datasetpath} --split 35
+  - coverage run -a xml_to_csv.py --annotations ${datasetpath}/train --output_csv train_labels.csv
+  - coverage run -a xml_to_csv.py --annotations ${datasetpath}/validate --output_csv validate_labels.csv
+  - coverage run -a ${landing_script} train --annotations ${datasetannotations} --dataset ${datasetpath} --weights=coco
   - coverage run -a ${landing_script} train --annotations ${datasetannotations} --dataset ${datasetpath} --weights=imagenet
+
 
 after_success:
   - coverage report -m

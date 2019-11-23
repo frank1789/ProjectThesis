@@ -4,11 +4,12 @@ Pillow
 cython
 matplotlib
 scikit-image
-tensorflow>=1.11.0,<1.14.1
+tensorflow>=1.11.0,<=1.14.1
 keras
 keras-preprocessing>=1.1.0
 opencv-python
 h5py
 imgaug
-jupyter 
+jupyter
 ipython
+pandas
