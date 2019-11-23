@@ -36,11 +36,9 @@ before_script:
 
 script:
   - coverage run downloadmanager.py
-  - echo "found dataset at ${DIR_DATASET}"
-  - echo "found dataset annotaions at ${datasetannotations}"
   - coverage run -a preparedata.py --dataset ${datasetpath} --split 35
-  - coverage run -a xml_to_csv.py --annotations ${datasetpath}/train -output_csv train_labels.csv
-  - coverage run -a xml_to_csv.py --annotations ${datasetpath}/validate -output_csv validate_labels.csv
+  - coverage run -a xml_to_csv.py --annotations ${datasetpath}/train --output_csv train_labels.csv
+  - coverage run -a xml_to_csv.py --annotations ${datasetpath}/validate --output_csv validate_labels.csv
   - coverage run -a ${landing_script} train --annotations ${datasetannotations} --dataset ${datasetpath} --weights=coco
   - coverage run -a ${landing_script} train --annotations ${datasetannotations} --dataset ${datasetpath} --weights=imagenet
 
