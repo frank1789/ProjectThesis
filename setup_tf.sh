@@ -52,10 +52,10 @@ csv_train=$(find . -name 'train_labels.csv')
 csv_val=$(find . -name 'validate_labels.csv')
 DIR_TRAIN=$(find $DIR_DATASET -name "train")
 DIR_VALIDATE=$(find $DIR_DATASET -name "validate")
-sh tf.sh generate_tfrecord.py --csv_input=${csv_train} \
+python3 generate_tfrecord.py --csv_input=${csv_train} \
     --output_path=data/train.record \
     --img_path=${DIR_TRAIN}
-sh tf.sh generate_tfrecord.py --csv_input=${csv_val} \
+python3 generate_tfrecord.py --csv_input=${csv_val} \
     --output_path=data/validate.record \
     --img_path=${DIR_VALIDATE}
 echo
@@ -66,7 +66,7 @@ echo
 
 cd $PROJECT_DIR/models
 curl -L http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.tar.gz -o ssd_mobilenet_v2_quantized.tar.gz
-tar -xvf --exclude='pipeline.config' ssd_mobilenet_v2_quantized.tar.gz
+tar -xvf ssd_mobilenet_v2_quantized.tar.gz
 rm ssd_mobilenet_v2_quantized.tar.gz
 cd ..
 
