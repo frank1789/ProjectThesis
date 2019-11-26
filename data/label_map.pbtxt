@@ -1,16 +1,16 @@
 item {
     id: 1
-    name: 'Circle Red'
+    name: 'Circle Red-orange-Circular'
 }
 
 
 item {
     id: 2
-    name: 'Green Square'
+    name: 'Green Square-green-Square'
 }
 
 
 item {
     id: 3
-    name: 'Circle Other'
+    name: 'Circle Other-other-Circular'
 }

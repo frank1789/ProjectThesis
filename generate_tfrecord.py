@@ -8,6 +8,9 @@ python generate_tfrecord.py --label=<LABEL> --csv_input=<PATH_TO_ANNOTATIONS_FOL
 python generate_tfrecord.py --label=<LABEL> --csv_input=<PATH_TO_ANNOTATIONS_FOLDER>/test_labels.csv  --output_path=<PATH_TO_ANNOTATIONS_FOLDER>/test.record
 """
 
+from collections import namedtuple, OrderedDict
+from object_detection.utils import dataset_util
+from PIL import Image
 import os
 import io
 import pandas as pd
@@ -17,9 +20,6 @@ import sys
 DIR = os.path.join(os.getcwd(), "models/research")
 sys.path.append(DIR)
 
-from PIL import Image
-from object_detection.utils import dataset_util
-from collections import namedtuple, OrderedDict
 
 flags = tf.app.flags
 flags.DEFINE_string('csv_input', '', 'Path to the CSV input')
@@ -104,4 +104,4 @@ def main(_):
 
 
 if __name__ == '__main__':
-    tf.compat.v1.app.run()
+    tf.app.run()

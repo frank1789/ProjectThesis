@@ -37,46 +37,50 @@ module list
 # setup environmnet
 ##############################################################################
 source $PWD/myenv/bin/activate
-echo
-echo "Updating source . . ."
-rm -rf $(find $PWD -name "ProjectThesis")
-git clone -b develop https://github.com/frank1789/ProjectThesis.git
-echo "Done"
-echo
 cd ProjectThesis
+rm -rf data/train.record
+rm -rf data/validate.record
+rm -rf train_labels.csv
+rm -rf validate_labels.csv
+rm -rf landingzone
+git reset --hard
+git pull
+rm -rf models
+touch data/train.record
+touch data/validate.record
 
-##############################################################################
-# Prepare dataset
-##############################################################################
-# Download dataset
-python3 downloadmanager.py
+sh setup_tf.sh coco_quantized
+# ##############################################################################
+# # Prepare dataset
+# ##############################################################################
+# # Download dataset
+# python3 downloadmanager.py
 
-# clean from from garbage files
-unzip -qq dataset.zip
-find . -type f -name '._*' -delete
-delfolder=$(find . -type d -name '__MACOSX')
-rm -rf ${delfolder}
+# # clean from from garbage files
+# unzip -qq dataset.zip
+# find . -type f -name '._*' -delete
+# delfolder=$(find . -type d -name '__MACOSX')
+# rm -rf ${delfolder}
 
-# search folder and files
-echo "Serching for datasetfolder"
-datasetpath=$(find $PWD -name "landingzone")
-echo "found dataset folder at ${datasetpath}"
-echo "Searching for annotations file"
-datasetannotations=$(find $PWD -name "annotations.json")
-echo "found dataset annotaions at ${datasetannotations}"
-echo
+# # search folder and files
+# echo "Serching for datasetfolder"
+# datasetpath=$(find $PWD -name "landingzone")
+# echo "found dataset folder at ${datasetpath}"
+# echo "Searching for annotations file"
+# datasetannotations=$(find $PWD -name "annotations.json")
+# echo "found dataset annotaions at ${datasetannotations}"
+# echo
 
-##############################################################################
-# Training
-##############################################################################
-python3 setup.py install
-# environment variable
-export HDF5_USE_FILE_LOCKING=FALSE
-# launch script python
-python3 landingzone.py train -a ${datasetannotations} -d ${datasetpath} --weights=coco
+# ##############################################################################
+# # Training
+# ##############################################################################
+# python3 setup.py install
+# # environment variable
+# export HDF5_USE_FILE_LOCKING=FALSE
+# # launch script python
+# python3 landingzone.py train -a ${datasetannotations} -d ${datasetpath} --weights=coco
 
 ##############################################################################
 # deactivate virtual env
 ##############################################################################
 deactivate
-
