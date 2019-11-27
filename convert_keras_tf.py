@@ -16,9 +16,9 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 ROOT_DIR = os.getcwd()
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
-from mrcnn import model as modellib
-from mrcnn import utils
 import landingzone
+from mrcnn import utils
+from mrcnn import model as modellib
 
 K.clear_session()
 K.set_learning_phase(0)
@@ -73,7 +73,8 @@ def h5_to_pb(h5_model, output_dir, model_name, out_prefix="output_"):
         tf.identity(h5_model.output[i], out_prefix + str(i + 1))
     sess = K.get_session()
     init_graph = sess.graph.as_graph_def()
-    main_graph = tf.compat.v1.graph_util.convert_variables_to_constants(sess, init_graph, out_nodes)
+    main_graph = tf.compat.v1.graph_util.convert_variables_to_constants(
+        sess, init_graph, out_nodes)
     with tf.gfile.GFile(os.path.join(output_dir, model_name), "wb") as filemodel:
         filemodel.write(main_graph.SerializeToString())
     print(f"pb model: {os.path.join(output_dir, model_name)}")
@@ -95,7 +96,7 @@ if __name__ == "__main__":
     model.keras_model.summary()
 
     # make folder for full model
-    model_dir = os.path.join(ROOT_DIR, "Model")
+    model_dir = os.path.join(ROOT_DIR, "models/keras_mask_rcnn")
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
 
