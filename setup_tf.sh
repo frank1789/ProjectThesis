@@ -73,16 +73,7 @@ if [ "$1" = coco_quantized ]; then
     sh $PROJECT_DIR/script_train/train_ssd_mobilenet_v2_quantized.sh
 
 elif [ "$1" = mask_inception ]; then
-    remote_link_model=http://download.tensorflow.org/models/object_detection/mask_rcnn_inception_v2_coco_2018_01_28.tar.gz
-    curl -L $remote_link_model -o mask_rcnn_inception_v2.tar.gz
-    tar -xvf mask_rcnn_inception_v2.tar.gz
-    rm mask_rcnn_inception_v2.tar.gz
-    cd mask_rcnn_inception_v2_coco_2018_01_28
-    echo $PWD
-    remote_config=https://raw.githubusercontent.com/frank1789/ProjectThesis/develop/models/mask_rcnn_inception_v2_coco_2018_01_28/pipeline.config
-    curl -OL $remote_config -o out_dir
-    rm checkpoint
-    export MODEL_DIR=$PROJECT_DIR/models/mask_rcnn_inception_v2_coco_2018_01_28
+    sh $PROJECT_DIR/script_train/train_mask_rcnn_inception_v2_coco_2018_01_28.sh
 
 elif [ "$1" = ssd_coco ]; then
     sh $PROJECT_DIR/script_train/train_ssd_mobilenet_v2_coco_2018_03_29.sh
