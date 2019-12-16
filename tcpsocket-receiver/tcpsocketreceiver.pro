@@ -23,8 +23,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     MyLabel.cpp \
-    tcpclient.cpp
-
+    tcpclient.cpp \
+    commonconnection.cpp
 
 HEADERS += \
     log/logger.h \
@@ -32,7 +32,6 @@ HEADERS += \
     mylabel.hpp \
     tcpclient.hpp \
     commonconnection.hpp
-
 
 FORMS += \
     mainwindow.ui

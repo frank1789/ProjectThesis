@@ -22,18 +22,23 @@ class TcpClient : public QWidget {
  public:
   explicit TcpClient(QWidget *parent = nullptr);
 
+ public slots:
+  /**
+   * @brief sendImage
+   * @param image
+   */
+  void sendImage(QImage image);
+
  signals:
   void updateImage(QImage image);
 
- public slots:
+ private slots:
   /**
    * @brief
    *
    */
-  void sendTestMessage();
-
   void sendTestMessageStream();
- private slots:
+
   /**
    * @brief
    *
@@ -53,14 +58,14 @@ class TcpClient : public QWidget {
   void sessionOpened();
 
   /**
-   * @brief
+   * @brief display erro from socket.
    *
    * @param socketError
    */
   void displayError(QAbstractSocket::SocketError socketError);
 
   /**
-   * @brief
+   * @brief enable button when port is filled.
    *
    */
   void enableConnectButton();
@@ -72,7 +77,9 @@ class TcpClient : public QWidget {
   void readFortune();
 
   /**
-   * @brief
+   * @brief Read from socket.
+   *
+   * Function that reads the socket when data are available.
    *
    */
   void readyRead();
@@ -93,21 +100,21 @@ class TcpClient : public QWidget {
   /**
    * @brief Create a Information Group object
    *
-   * @return QGroupBox*
+   * @return QGridLayout* layout.
    */
   QGroupBox *createInformationGroup();
 
   /**
    * @brief Create a Log Group object
    *
-   * @return QGroupBox*
+   * @return QGroupBox* widget.
    */
   QGroupBox *createLogGroup();
 
   /**
-   * @brief
+   * @brief update the UI.
    *
-   * @param state
+   * @param[in] state socket status
    */
   void updateGui(QAbstractSocket::SocketState state);
 
@@ -129,6 +136,13 @@ class TcpClient : public QWidget {
 
   // data exchanged
   QByteArray receive_data;
+
+  QThread *thread{nullptr};
+
+#if TEST_IMAGE
+ private slots:
+  void sendImageMessage();
+#endif
 };
 
 #endif  // TCPCLIENT_HPP
