@@ -12,7 +12,7 @@ echo
 ##############################################################################
 # Training
 ##############################################################################
-python3 setup.py install
+
 # launch script python
 export HDF5_USE_FILE_LOCKING=FALSE
 python3 landingzone.py train -a ${datasetannotations} -d ${datasetpath} --weights=coco
