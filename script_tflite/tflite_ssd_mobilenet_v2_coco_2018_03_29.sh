@@ -9,7 +9,8 @@ export PROJECT_DIR=$PWD
 export TF_API_DIR=$PROJECT_DIR/tf-models/research
 export PYTHONPATH=$PYTHONPATH:$TF_API_DIR:$TF_API_DIR/slim
 export MODEL_DIR=$PROJECT_DIR/models/ssd_mobilenet_v2_coco_2018_03_29
-export CHECKPOINT_PATH=$MODEL_DIR/model.ckpt-59
+export PIPELINE_CONFIG_PATH=$MODEL_DIR/pipeline.config
+export CHECKPOINT_PATH=$MODEL_DIR/model.ckpt-96
 export OUTPUT_DIR=$MODEL_DIR/tmp/tflite
 
 ##############################################################################
