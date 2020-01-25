@@ -28,7 +28,7 @@
 module avail
 
 # load moudle
-module load python-3.5.2 cuda-10.0
+module load python-3.5.2 cuda-9.0
 
 # show loaded module
 module list
@@ -80,4 +80,4 @@ sh setup_tf.sh ssd_coco
 ##############################################################################
 # deactivate virtual env
 ##############################################################################
-deactivate
+#deactivate
