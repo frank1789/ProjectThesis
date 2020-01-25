@@ -28,7 +28,7 @@
 module avail
 
 # load moudle
-module load python-3.5.2 cuda-9.0
+module load python-3.5.2 cuda-10.0
 
 # show loaded module
 module list
@@ -36,20 +36,17 @@ module list
 ##############################################################################
 # setup environmnet
 ##############################################################################
-source $PWD/myenv/bin/activate
+#source $PWD/myenv/bin/activate
 cd ProjectThesis
-rm -rf data/train.record
-rm -rf data/validate.record
 rm -rf train_labels.csv
 rm -rf validate_labels.csv
-rm -rf landingzone
 git reset --hard
 git pull
 rm -rf models
-touch data/train.record
-touch data/validate.record
+python3 -c "import tensorflow as tf; print('tensorflow version installed', tf.__version__)"
+# run script
+sh setup_tf.sh ssd_coco
 
-sh setup_tf.sh coco_quantized
 # ##############################################################################
 # # Prepare dataset
 # ##############################################################################
